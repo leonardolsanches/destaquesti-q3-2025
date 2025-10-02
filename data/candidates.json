@@ -6,7 +6,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença",
     "photo": "20251002180436.png",
-    "id": 1
+    "id": 1,
+    "vote_count": 0
   },
   {
     "nome": "Moyses Lovato Caroca",
@@ -15,7 +16,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença",
     "photo": "20251002181126.png",
-    "id": 2
+    "id": 2,
+    "vote_count": 0
   },
   {
     "nome": "William Cesar Leite",
@@ -24,7 +26,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença",
     "photo": "20251002181057.png",
-    "id": 3
+    "id": 3,
+    "vote_count": 0
   },
   {
     "nome": "Aline Ramos",
@@ -33,7 +36,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença",
     "photo": "20251002180530.png",
-    "id": 4
+    "id": 4,
+    "vote_count": 0
   },
   {
     "nome": "Bruno Benedito",
@@ -42,7 +46,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença",
     "photo": "20251002181010.png",
-    "id": 5
+    "id": 5,
+    "vote_count": 0
   },
   {
     "nome": "Fernando Carvalhais Silva",
@@ -51,7 +56,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença",
     "photo": "default_avatar.png",
-    "id": 6
+    "id": 6,
+    "vote_count": 0
   },
   {
     "nome": "Murilo Vilela de Almeida",
@@ -60,7 +66,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença",
     "photo": "default_avatar.png",
-    "id": 7
+    "id": 7,
+    "vote_count": 0
   },
   {
     "nome": "Diego de Almeida Silva",
@@ -69,7 +76,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença",
     "photo": "20251002180927.png",
-    "id": 8
+    "id": 8,
+    "vote_count": 0
   },
   {
     "nome": "Fernando Barreto",
@@ -78,7 +86,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença",
     "photo": "20251002180906.png",
-    "id": 9
+    "id": 9,
+    "vote_count": 0
   },
   {
     "nome": "Paulo de Tarso Feital",
@@ -87,7 +96,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença",
     "photo": "20251002180827.png",
-    "id": 10
+    "id": 10,
+    "vote_count": 0
   },
   {
     "nome": "André Luis Nunes",
@@ -96,7 +106,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença - Líder",
     "photo": "20251002180745.png",
-    "id": 11
+    "id": 11,
+    "vote_count": 0
   },
   {
     "nome": "Diego Santos Rodrigues",
@@ -105,7 +116,8 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença - Líder",
     "photo": "20251002180700.png",
-    "id": 12
+    "id": 12,
+    "vote_count": 0
   },
   {
     "nome": "Cristiane F. Mertins",
@@ -114,6 +126,7 @@
     "periodo": "Q3/2025",
     "categoria": "Eu Faço a Diferença - Líder",
     "photo": "20251002180618.png",
-    "id": 13
+    "id": 13,
+    "vote_count": 0
   }
 ]

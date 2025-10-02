@@ -238,7 +238,9 @@ class DataManager:
         }
 
     def reset_voting(self):
+        """Reseta votos e votantes, mantém candidatos"""
         self.save_voters([])
+        self._save_json(self.votes_file, {})
         candidates = self.get_candidates()
         for candidate in candidates:
             candidate['vote_count'] = 0

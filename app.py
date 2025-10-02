@@ -234,16 +234,6 @@ def reset_voting():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/admin/reset-results', methods=['POST'])
-@require_admin_auth
-def reset_results():
-    try:
-        dm.reset_voting()
-        return jsonify({'success': True})
-    
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
 @app.route('/admin/delete-all-candidates', methods=['POST'])
 @require_admin_auth
 def delete_all_candidates():
@@ -328,10 +318,14 @@ def results():
     results_data = dm.get_results()
     config = dm.get_config()
     
+    # Calcular total de votos
+    total_votes = sum(c.get('vote_count', 0) for c in results_data['all_candidates'])
+    
     return render_template('results.html', 
                          results=results_data, 
                          config=config,
-                         is_active=dm.is_voting_active())
+                         is_active=dm.is_voting_active(),
+                         total_votes=total_votes)
 
 @app.route('/api/results')
 def api_results():
