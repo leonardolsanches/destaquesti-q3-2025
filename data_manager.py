@@ -171,8 +171,13 @@ class DataManager:
         professional = [c for c in candidates if 'Líder' not in c.get('categoria', '')]
         leader = [c for c in candidates if 'Líder' in c.get('categoria', '')]
         
+        # Para resultados, manter ordenação por votos
         professional.sort(key=lambda x: x['vote_count'], reverse=True)
         leader.sort(key=lambda x: x['vote_count'], reverse=True)
+        
+        # Para exibição geral, criar listas ordenadas alfabeticamente
+        professional_alpha = sorted(professional, key=lambda x: x['nome'])
+        leader_alpha = sorted(leader, key=lambda x: x['nome'])
         
         if len(professional) >= 4 and len(leader) >= 1:
             top_professional = professional[:4]
@@ -205,7 +210,9 @@ class DataManager:
             'top_5': top_5,
             'all_candidates': candidates,
             'professional': professional,
-            'leader': leader
+            'leader': leader,
+            'professional_alpha': professional_alpha,
+            'leader_alpha': leader_alpha
         }
     
     def reset_voting(self):

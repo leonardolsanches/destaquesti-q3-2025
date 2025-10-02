@@ -4,7 +4,12 @@
 
 {% block content %}
 <div class="container my-5">
-    <h1 class="text-center mb-4 text-claro">Painel Administrativo</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-claro">Painel Administrativo</h1>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-sign-out-alt"></i> Sair
+        </a>
+    </div>
 
     <div class="row">
         <div class="col-md-6 mb-4">

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory, session, flash
 import os
 from datetime import datetime
 from werkzeug.utils import secure_filename
@@ -7,6 +7,7 @@ from PIL import Image
 import io
 import base64
 from data_manager import DataManager
+from functools import wraps
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET', 'dev-secret-key-change-in-production')
@@ -16,6 +17,18 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 dm = DataManager()
+
+# Credenciais de admin
+ADMIN_USERNAME = 'leonardo'
+ADMIN_PASSWORD = 'thaiane'
+
+def require_admin_auth(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'xlsx'}
@@ -44,13 +57,35 @@ def process_image(image_file):
 def index():
     return redirect(url_for('vote'))
 
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            return redirect(url_for('admin'))
+        else:
+            flash('Credenciais inválidas', 'error')
+    
+    return render_template('admin_login.html')
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    flash('Logout realizado com sucesso', 'success')
+    return redirect(url_for('admin_login'))
+
 @app.route('/admin')
+@require_admin_auth
 def admin():
     candidates = dm.get_candidates()
     config = dm.get_config()
     return render_template('admin.html', candidates=candidates, config=config)
 
 @app.route('/admin/upload-excel', methods=['POST'])
+@require_admin_auth
 def upload_excel():
     try:
         if 'file' not in request.files:
@@ -100,6 +135,7 @@ def upload_excel():
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/upload-photo', methods=['POST'])
+@require_admin_auth
 def upload_photo():
     try:
         candidate_id = int(request.form.get('candidate_id'))
@@ -128,6 +164,7 @@ def upload_photo():
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/update-candidate', methods=['POST'])
+@require_admin_auth
 def update_candidate():
     try:
         data = request.get_json()
@@ -147,6 +184,7 @@ def update_candidate():
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/delete-candidate', methods=['POST'])
+@require_admin_auth
 def delete_candidate():
     try:
         data = request.get_json()
@@ -158,6 +196,7 @@ def delete_candidate():
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/set-voting-config', methods=['POST'])
+@require_admin_auth
 def set_voting_config():
     try:
         data = request.get_json()
@@ -174,6 +213,7 @@ def set_voting_config():
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/stop-voting', methods=['POST'])
+@require_admin_auth
 def stop_voting():
     try:
         config = dm.get_config()
@@ -185,6 +225,7 @@ def stop_voting():
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/reset-voting', methods=['POST'])
+@require_admin_auth
 def reset_voting():
     try:
         dm.reset_voting()
@@ -194,6 +235,7 @@ def reset_voting():
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/delete-all-candidates', methods=['POST'])
+@require_admin_auth
 def delete_all_candidates():
     try:
         dm.delete_all_candidates()
@@ -203,6 +245,7 @@ def delete_all_candidates():
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/api/candidate/<int:candidate_id>')
+@require_admin_auth
 def get_candidate(candidate_id):
     try:
         candidates = dm.get_candidates()
@@ -224,6 +267,10 @@ def vote():
     
     professional = [c for c in candidates if 'Líder' not in c.get('categoria', '')]
     leader = [c for c in candidates if 'Líder' in c.get('categoria', '')]
+    
+    # Ordenar alfabeticamente por nome
+    professional.sort(key=lambda x: x['nome'])
+    leader.sort(key=lambda x: x['nome'])
     
     return render_template('vote.html', 
                          professional=professional, 
