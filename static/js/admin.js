@@ -105,6 +105,28 @@ document.getElementById('resetVotingBtn').addEventListener('click', async () => 
     }
 });
 
+document.getElementById('resetResultsBtn').addEventListener('click', async () => {
+    if (!confirm('ATENÇÃO: Isso irá apagar todos os votos e o histórico de votantes! Tem certeza?')) return;
+    
+    try {
+        const response = await fetch('/admin/reset-results', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Resultados apurados resetados com sucesso!');
+            location.reload();
+        } else {
+            alert(`Erro: ${data.error}`);
+        }
+    } catch (error) {
+        alert(`Erro: ${error.message}`);
+    }
+});
+
 document.getElementById('deleteAllCandidatesBtn').addEventListener('click', async () => {
     if (!confirm('ATENÇÃO: Isso irá excluir TODOS os candidatos carregados! Tem certeza?')) return;
     

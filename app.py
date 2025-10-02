@@ -234,6 +234,16 @@ def reset_voting():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/admin/reset-results', methods=['POST'])
+@require_admin_auth
+def reset_results():
+    try:
+        dm.reset_voting()
+        return jsonify({'success': True})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/admin/delete-all-candidates', methods=['POST'])
 @require_admin_auth
 def delete_all_candidates():
@@ -299,13 +309,12 @@ def submit_vote():
         categoria = candidate.get('categoria', '')
         is_leader = 'Líder' in categoria
         
-        # Verificar se já votou e alertar, mas permitir atualização
-        if dm.has_voted(email, candidate_id):
-            categoria_nome = 'Líder' if is_leader else 'Profissional'
-            # Não retornar erro, apenas continuar (permite atualizar voto)
-            pass
+        # Verificar se já votou nesta categoria
+        previous_vote_id = dm.has_voted(email, candidate_id)
         
+        # Adicionar voto ao candidato (add_voter já remove voto anterior se existir)
         dm.add_vote(candidate_id)
+        
         if not dm.add_voter(email, candidate_id):
             return jsonify({'success': False, 'error': 'Erro ao registrar voto'})
         
