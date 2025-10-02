@@ -1,0 +1,168 @@
+:root {
+    --claro-red: #8B1538;
+    --claro-red-dark: #6B0F2A;
+    --claro-red-light: #AB1A42;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.bg-claro {
+    background-color: var(--claro-red) !important;
+}
+
+.text-claro {
+    color: var(--claro-red) !important;
+}
+
+.btn-claro {
+    background-color: var(--claro-red);
+    border-color: var(--claro-red);
+    color: white;
+}
+
+.btn-claro:hover {
+    background-color: var(--claro-red-dark);
+    border-color: var(--claro-red-dark);
+    color: white;
+}
+
+.btn-claro:active, .btn-claro:focus {
+    background-color: var(--claro-red-dark) !important;
+    border-color: var(--claro-red-dark) !important;
+    color: white !important;
+    box-shadow: 0 0 0 0.25rem rgba(139, 21, 56, 0.25) !important;
+}
+
+.navbar-brand img {
+    height: 40px;
+}
+
+.candidate-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.candidate-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border-color: var(--claro-red);
+}
+
+.candidate-photo {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 3px solid var(--claro-red);
+}
+
+.candidate-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--claro-red);
+}
+
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+#countdown {
+    font-size: 2.5rem;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+}
+
+.paste-area {
+    background-color: #f8f9fa;
+    cursor: pointer;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.paste-area:hover {
+    background-color: #e9ecef;
+}
+
+.paste-area.active {
+    border-color: var(--claro-red);
+    background-color: #fff;
+}
+
+.badge-top {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.2rem;
+    padding: 8px 12px;
+    border-radius: 50%;
+    z-index: 10;
+}
+
+.border-claro {
+    border: 3px solid var(--claro-red) !important;
+}
+
+.col-lg-2-4 {
+    flex: 0 0 20%;
+    max-width: 20%;
+}
+
+@media (max-width: 992px) {
+    .col-lg-2-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+}
+
+@media (max-width: 576px) {
+    .col-lg-2-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    #countdown {
+        font-size: 1.8rem;
+    }
+    
+    .candidate-photo {
+        height: 150px;
+    }
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(139, 21, 56, 0.1);
+}
+
+.alert {
+    border-radius: 10px;
+}
+
+.modal-content {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.form-control:focus {
+    border-color: var(--claro-red);
+    box-shadow: 0 0 0 0.25rem rgba(139, 21, 56, 0.25);
+}
+
+.table-success {
+    background-color: rgba(139, 21, 56, 0.1) !important;
+}

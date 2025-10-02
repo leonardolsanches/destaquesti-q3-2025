@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Votação Destaques Q3/2025{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <h1 class="display-4 text-claro mb-3">Votação Destaques Q3/2025</h1>
+        <h3 class="text-muted">Diretoria Sistemas de Negócio</h3>
+        
+        <div class="alert alert-info mt-4" role="alert">
+            <h5>⏰ Tempo restante:</h5>
+            <h2 id="countdown" class="text-claro mb-0">Carregando...</h2>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header bg-claro text-white">
+            <h5 class="mb-0">Digite seu e-mail corporativo para votar</h5>
+        </div>
+        <div class="card-body">
+            <form id="emailForm">
+                <div class="input-group">
+                    <input type="email" class="form-control form-control-lg" id="voterEmail" 
+                           placeholder="seu.email@claro.com.br" required>
+                    <button class="btn btn-claro btn-lg" type="submit">Confirmar E-mail</button>
+                </div>
+                <small class="text-muted">Somente e-mails @claro.com.br são aceitos. Você pode votar em 1 Profissional e 1 Líder.</small>
+            </form>
+        </div>
+    </div>
+
+    <div id="votingSection" style="display: none;">
+        <h3 class="text-center mb-4 text-claro">Selecione seu candidato favorito</h3>
+        
+        {% if professional %}
+        <h4 class="mb-3">Categoria: Eu Faço a Diferença - Profissional</h4>
+        <div class="row mb-5">
+            {% for candidate in professional %}
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card candidate-card shadow-sm h-100" data-id="{{ candidate.id }}">
+                    <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                         class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                    <div class="card-body">
+                        <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
+                        <p class="card-text"><small><strong>Gestor:</strong> {{ candidate.gestor }}</small></p>
+                        <p class="card-text">{{ candidate.justificativa[:100] }}{% if candidate.justificativa|length > 100 %}...{% endif %}</p>
+                        <button class="btn btn-claro w-100 vote-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}">
+                            Votar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if leader %}
+        <h4 class="mb-3">Categoria: Eu Faço a Diferença - Líder</h4>
+        <div class="row">
+            {% for candidate in leader %}
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card candidate-card shadow-sm h-100" data-id="{{ candidate.id }}">
+                    <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                         class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                    <div class="card-body">
+                        <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
+                        <p class="card-text"><small><strong>Gestor:</strong> {{ candidate.gestor }}</small></p>
+                        <p class="card-text">{{ candidate.justificativa[:100] }}{% if candidate.justificativa|length > 100 %}...{% endif %}</p>
+                        <button class="btn btn-claro w-100 vote-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}">
+                            Votar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-claro text-white">
+                <h5 class="modal-title">Confirmar Voto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Você confirma seu voto em:</p>
+                <h4 class="text-claro" id="confirmName"></h4>
+                <p class="text-muted">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-claro" id="confirmVoteBtn">Confirmar Voto</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const endDate = new Date("{{ config.voting_end_date }}").getTime();
+</script>
+<script src="{{ url_for('static', filename='js/vote.js') }}"></script>
+{% endblock %}

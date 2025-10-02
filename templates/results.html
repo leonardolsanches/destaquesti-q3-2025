@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados - Votação Q3/2025{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <h1 class="display-4 text-claro mb-3">Resultados da Votação</h1>
+        <h3 class="text-muted">Destaques Q3/2025</h3>
+        
+        {% if is_active %}
+        <div class="alert alert-warning mt-3">
+            <strong>Votação em andamento!</strong> Resultados parciais sendo atualizados em tempo real.
+        </div>
+        {% else %}
+        <div class="alert alert-success mt-3">
+            <strong>Votação encerrada!</strong> Resultados finais.
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-claro text-white">
+                    <h5 class="mb-0">Categoria: Profissional</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="professionalChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-claro text-white">
+                    <h5 class="mb-0">Categoria: Liderança</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="leaderChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-5">
+        <div class="card-header bg-claro text-white">
+            <h5 class="mb-0">🏆 TOP 5 - Destaques Q3/2025</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for candidate in results.top_5 %}
+                <div class="col-md-4 col-lg-2-4 mb-4">
+                    <div class="card h-100 shadow-sm border-claro">
+                        <div class="badge-top {% if loop.index <= 3 %}bg-warning{% else %}bg-info{% endif %}">
+                            #{{ loop.index }}
+                        </div>
+                        <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                             class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
+                            <p class="card-text"><small>{{ candidate.categoria }}</small></p>
+                            <h3 class="text-claro">{{ candidate.vote_count }} votos</h3>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-claro text-white">
+            <h5 class="mb-0">Ranking Completo</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Foto</th>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Gestor</th>
+                            <th>Votos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for candidate in results.all_candidates|sort(attribute='vote_count', reverse=True) %}
+                        <tr {% if loop.index <= 5 %}class="table-success"{% endif %}>
+                            <td><strong>{{ loop.index }}º</strong></td>
+                            <td>
+                                <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                                     class="candidate-thumb" alt="{{ candidate.nome }}">
+                            </td>
+                            <td>{{ candidate.nome }}</td>
+                            <td><span class="badge {% if 'Líder' in candidate.categoria %}bg-warning{% else %}bg-info{% endif %}">{{ candidate.categoria }}</span></td>
+                            <td>{{ candidate.gestor }}</td>
+                            <td><strong>{{ candidate.vote_count }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+{% endblock %}

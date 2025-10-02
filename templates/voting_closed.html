@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Votação Encerrada{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center">
+        <div class="alert alert-warning shadow" role="alert">
+            <h1 class="display-3 mb-4">⚠️</h1>
+            <h2 class="text-claro mb-3">Votação Encerrada</h2>
+            <p class="lead">A votação para os Destaques Q3/2025 não está aberta no momento.</p>
+            <hr>
+            <p class="mb-4">Confira os resultados ou aguarde a abertura de uma nova votação.</p>
+            <a href="{{ url_for('results') }}" class="btn btn-claro btn-lg">Ver Resultados</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+[
+  {
+    "nome": "Therence Barros de Oliveira",
+    "justificativa": "Entrega projeto Claro UP - Sucesso de implementação, liderança técnica e projeto ",
+    "gestor": "Mario",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "20251002180436.png",
+    "id": 1
+  },
+  {
+    "nome": "Moyses Lovato Caroca",
+    "justificativa": "Participação no plano de 100 dias, resolvendo problemas e participação nos rollout do PCO",
+    "gestor": "Mario",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "20251002181126.png",
+    "id": 2
+  },
+  {
+    "nome": "William Cesar Leite",
+    "justificativa": "Preencher",
+    "gestor": "Aline",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "20251002181057.png",
+    "id": 3
+  },
+  {
+    "nome": "Aline Ramos",
+    "justificativa": "Atuação no projeto RGC na frente da residencial buscando soluções para Mudanças que precisaram ser implementadas para viabilizar a entrega de documentos. Comprometimento e persistência para fazer acontecer!",
+    "gestor": "Aline",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "20251002180530.png",
+    "id": 4
+  },
+  {
+    "nome": "Bruno Benedito",
+    "justificativa": "Liderou várias frentes do projeto RGC Atendimento Solar, com muito comprometimento, envolvimento muitas equipes, e soube chegar nos resultados necessários. A sua atuação fez a diferença para chegarmos no prazo para o projeto Regulatório.",
+    "gestor": "Aline",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "20251002181010.png",
+    "id": 5
+  },
+  {
+    "nome": "Fernando Carvalhais Silva",
+    "justificativa": "Preencher",
+    "gestor": "Marcus",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "default_avatar.png",
+    "id": 6
+  },
+  {
+    "nome": "Murilo Vilela de Almeida",
+    "justificativa": "Atuação de destaque na entrega do projeto RGC, mostrando dedicação, domínio técnico e capacidade de lidar com a complexidade do desafio. Sua contribuição foi decisiva para que o time alcançasse o resultado esperado dentro do prazo estipulado pela Anatel. Além do destaque interno, tem sido constantemente reconhecido pela área de negócios.\nPor todo esse empenho e impacto, agradecemos pelo trabalho realizado, e, com orgulho, reconhecemos sua performance e o indicamos como destaque do trimestre.",
+    "gestor": "Waldir",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "default_avatar.png",
+    "id": 7
+  },
+  {
+    "nome": "Diego de Almeida Silva",
+    "justificativa": "Esforços constantes nas implantações de Gevenue quer seja de correções de aplicação quer seja de sincronismo de dados entre sistemas.",
+    "gestor": "Waldir",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "20251002180927.png",
+    "id": 8
+  },
+  {
+    "nome": "Fernando Barreto",
+    "justificativa": "Está na Claro há cerca de 6 meses e, desde sua chegada, vem agregando muito conhecimento e agilidade ao time. Atuou nos testes de performance do NFCOM Pós e, atualmente, contribui na frente de Mobile Single como facilitador na validação entre fornecedor e time de testes. Seu trabalho tem sido essencial para reduzir a reabertura de defeitos e acelerar as análises nas demais frentes do NFCOM: Combo Multi, Solar e Cobilling Entrante.",
+    "gestor": "Wollinger",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "20251002180906.png",
+    "id": 9
+  },
+  {
+    "nome": "Paulo de Tarso Feital",
+    "justificativa": "Liderança na frente do RGC com o escopo código único. Vem atuando com dedicação e qualidade para solução a ser implementada . É uma demanda bem complexa que  envolve vários sistemas do empresarial.",
+    "gestor": "Wollinger",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "20251002180827.png",
+    "id": 10
+  },
+  {
+    "nome": "André Luis Nunes",
+    "justificativa": "Entrega do Projeto Apigee X - Liderança e  resiliência para fazer migração de 2k APIs com volume mensal de 10Bi.",
+    "gestor": "Mario",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença - Líder",
+    "photo": "20251002180745.png",
+    "id": 11
+  },
+  {
+    "nome": "Diego Santos Rodrigues",
+    "justificativa": "Reconhecido por seu excepcional comprometimento e visão holística em seu trabalho. Ele não se limita às suas responsabilidades, mas colabora de forma ativa em diversas áreas, contribuindo significativamente para os resultados do negócio. Sua atuação nas melhorias dos processos de Release, Testes e Desenvolvimento tem sido fundamental para elevar a qualidade dos fornecedores, refletindo seu compromisso com a excelência e a inovação. A dedicação de Diego é um exemplo inspirador e um ativo valioso para nossa equipe.",
+    "gestor": "Aline",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença - Líder",
+    "photo": "20251002180700.png",
+    "id": 12
+  },
+  {
+    "nome": "Cristiane F. Mertins",
+    "justificativa": "implantou vários funcionalidades de financeiro, em especial o Projeto Coboletamento,  que permite várias funcionalidades no contrato do cliente, sem precisar descoboletar.  Teve  habilitadade  de coordenar equipes de negócios, sistemas e qualidade de forma exemplar para um único objetivo.  Tem atuado com muita perseverança e comprometimento em vários outros projetos.",
+    "gestor": "Aline",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença - Líder",
+    "photo": "20251002180618.png",
+    "id": 13
+  }
+]

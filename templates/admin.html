@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Administração - Votação Q3/2025{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4 text-claro">Painel Administrativo</h1>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-claro text-white">
+                    <h5 class="mb-0">Carregar Planilha Excel</h5>
+                </div>
+                <div class="card-body">
+                    <form id="uploadExcelForm">
+                        <div class="mb-3">
+                            <label for="excelFile" class="form-label">Selecione o arquivo XLSX</label>
+                            <input type="file" class="form-control" id="excelFile" accept=".xlsx" required>
+                        </div>
+                        <button type="submit" class="btn btn-claro w-100">Carregar Candidatos</button>
+                    </form>
+                    <div id="uploadMessage" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-claro text-white">
+                    <h5 class="mb-0">Configurar Votação</h5>
+                </div>
+                <div class="card-body">
+                    <form id="votingConfigForm">
+                        <div class="mb-3">
+                            <label for="endDate" class="form-label">Data e Hora de Encerramento</label>
+                            <input type="datetime-local" class="form-control" id="endDate" required>
+                        </div>
+                        <button type="submit" class="btn btn-claro w-100">Iniciar Votação</button>
+                    </form>
+                    <button id="stopVotingBtn" class="btn btn-danger w-100 mt-2">Encerrar Votação</button>
+                    <button id="resetVotingBtn" class="btn btn-warning w-100 mt-2">Resetar Votos</button>
+                    <button id="deleteAllCandidatesBtn" class="btn btn-danger w-100 mt-2">Excluir Todos os Indicados</button>
+                    
+                    {% if config.voting_active %}
+                    <div class="alert alert-success mt-3">
+                        <strong>Votação ativa!</strong><br>
+                        Encerra em: {{ config.voting_end_date }}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-secondary mt-3">
+                        Votação inativa
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-claro text-white">
+            <h5 class="mb-0">Gerenciar Candidatos</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nome</th>
+                            <th>Justificativa</th>
+                            <th>Gestor</th>
+                            <th>Categoria</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidatesTable">
+                        {% for candidate in candidates %}
+                        <tr data-id="{{ candidate.id }}">
+                            <td>
+                                <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                                     class="candidate-thumb" alt="{{ candidate.nome }}">
+                            </td>
+                            <td class="candidate-nome">{{ candidate.nome }}</td>
+                            <td class="candidate-justificativa">{{ candidate.justificativa[:50] }}{% if candidate.justificativa|length > 50 %}...{% endif %}</td>
+                            <td class="candidate-gestor">{{ candidate.gestor }}</td>
+                            <td class="candidate-categoria">{{ candidate.categoria }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary edit-btn" data-id="{{ candidate.id }}">Editar</button>
+                                <button class="btn btn-sm btn-danger delete-btn" data-id="{{ candidate.id }}">Excluir</button>
+                                <button class="btn btn-sm btn-info photo-btn" data-id="{{ candidate.id }}">Foto</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-claro text-white">
+                <h5 class="modal-title">Editar Candidato</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editId">
+                    <div class="mb-3">
+                        <label for="editNome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="editNome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editJustificativa" class="form-label">Justificativa</label>
+                        <textarea class="form-control" id="editJustificativa" rows="4" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editGestor" class="form-label">Gestor</label>
+                        <input type="text" class="form-control" id="editGestor" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCategoria" class="form-label">Categoria</label>
+                        <select class="form-control" id="editCategoria" required>
+                            <option value="Eu Faço a Diferença">Eu Faço a Diferença</option>
+                            <option value="Eu Faço a Diferença - Líder">Eu Faço a Diferença - Líder</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-claro w-100">Salvar Alterações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="photoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-claro text-white">
+                <h5 class="modal-title">Upload de Foto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="photoId">
+                <div class="mb-3">
+                    <label for="photoFile" class="form-label">Selecionar arquivo</label>
+                    <input type="file" class="form-control" id="photoFile" accept="image/*">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ou colar imagem (Ctrl+V)</label>
+                    <div id="pasteArea" class="paste-area text-center p-4 border rounded">
+                        Clique aqui e pressione Ctrl+V para colar a imagem
+                    </div>
+                </div>
+                <button id="uploadPhotoBtn" class="btn btn-claro w-100">Fazer Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
