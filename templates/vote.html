@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}Votação Destaques Q3/2025{% endblock %}
@@ -31,49 +32,161 @@
     </div>
 
     <div id="votingSection" style="display: none;">
-        <h3 class="text-center mb-4 text-claro">Selecione seu candidato favorito</h3>
+        <h3 class="text-center mb-4 text-claro">Selecione seus candidatos favoritos</h3>
         
-        {% if professional %}
-        <h4 class="mb-3">Categoria: Eu Faço a Diferença - Profissional</h4>
-        <div class="row mb-5">
-            {% for candidate in professional %}
-            <div class="col-md-4 col-lg-3 mb-4">
-                <div class="card candidate-card shadow-sm h-100" data-id="{{ candidate.id }}">
-                    <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
-                         class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
-                    <div class="card-body">
-                        <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
-                        <p class="card-text"><small><strong>Gestor:</strong> {{ candidate.gestor }}</small></p>
-                        <p class="card-text">{{ candidate.justificativa[:100] }}{% if candidate.justificativa|length > 100 %}...{% endif %}</p>
-                        <button class="btn btn-claro w-100 vote-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}">
-                            Votar
-                        </button>
+        <div class="alert alert-info text-center mb-4 mobile-instructions">
+            <strong>Mobile:</strong> Arraste para os lados para navegar. Toque 2x no card para selecionar.<br>
+            <strong>Desktop:</strong> Use as setas ou clique em "Selecionar"
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Seus votos selecionados:</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Profissional:</strong> <span id="selectedProfessional" class="text-muted">Nenhum selecionado</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Líder:</strong> <span id="selectedLeader" class="text-muted">Nenhum selecionado</span></p>
                     </div>
                 </div>
+                <button id="submitVotesBtn" class="btn btn-success btn-lg w-100" style="display: none;">
+                    Finalizar Votação
+                </button>
             </div>
-            {% endfor %}
+        </div>
+        
+        {% if professional %}
+        <div class="category-section mb-5">
+            <h4 class="mb-3 text-center">Categoria: Eu Faço a Diferença - Profissional</h4>
+            
+            <!-- Desktop Grid View -->
+            <div class="desktop-grid">
+                <div class="row g-3">
+                    {% for candidate in professional %}
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="card candidate-card shadow-lg h-100" data-id="{{ candidate.id }}" data-category="professional">
+                            <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                                 class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                            <div class="card-body">
+                                <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
+                                <p class="card-text"><small><strong>Gestor:</strong> {{ candidate.gestor }}</small></p>
+                                <p class="card-text">{{ candidate.justificativa }}</p>
+                                <button class="btn btn-outline-claro w-100 select-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}" data-category="professional">
+                                    Selecionar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Mobile Carousel View -->
+            <div class="mobile-carousel">
+                <div class="carousel-container">
+                    <button class="carousel-nav carousel-prev" data-category="professional">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    
+                    <div class="carousel-wrapper" id="professionalCarousel">
+                        {% for candidate in professional %}
+                        <div class="carousel-slide {% if loop.first %}active{% endif %}" data-id="{{ candidate.id }}" data-category="professional">
+                            <div class="card candidate-card shadow-lg h-100">
+                                <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                                     class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                                <div class="card-body">
+                                    <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
+                                    <p class="card-text"><small><strong>Gestor:</strong> {{ candidate.gestor }}</small></p>
+                                    <p class="card-text">{{ candidate.justificativa }}</p>
+                                    <button class="btn btn-outline-claro w-100 select-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}" data-category="professional">
+                                        Selecionar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <button class="carousel-nav carousel-next" data-category="professional">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="carousel-indicators" id="professionalIndicators">
+                    {% for candidate in professional %}
+                    <span class="indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></span>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
         {% endif %}
 
         {% if leader %}
-        <h4 class="mb-3">Categoria: Eu Faço a Diferença - Líder</h4>
-        <div class="row">
-            {% for candidate in leader %}
-            <div class="col-md-4 col-lg-3 mb-4">
-                <div class="card candidate-card shadow-sm h-100" data-id="{{ candidate.id }}">
-                    <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
-                         class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
-                    <div class="card-body">
-                        <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
-                        <p class="card-text"><small><strong>Gestor:</strong> {{ candidate.gestor }}</small></p>
-                        <p class="card-text">{{ candidate.justificativa[:100] }}{% if candidate.justificativa|length > 100 %}...{% endif %}</p>
-                        <button class="btn btn-claro w-100 vote-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}">
-                            Votar
-                        </button>
+        <div class="category-section">
+            <h4 class="mb-3 text-center">Categoria: Eu Faço a Diferença - Líder</h4>
+            
+            <!-- Desktop Grid View -->
+            <div class="desktop-grid">
+                <div class="row g-3">
+                    {% for candidate in leader %}
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="card candidate-card shadow-lg h-100" data-id="{{ candidate.id }}" data-category="leader">
+                            <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                                 class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                            <div class="card-body">
+                                <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
+                                <p class="card-text"><small><strong>Gestor:</strong> {{ candidate.gestor }}</small></p>
+                                <p class="card-text">{{ candidate.justificativa }}</p>
+                                <button class="btn btn-outline-claro w-100 select-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}" data-category="leader">
+                                    Selecionar
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
+            
+            <!-- Mobile Carousel View -->
+            <div class="mobile-carousel">
+                <div class="carousel-container">
+                    <button class="carousel-nav carousel-prev" data-category="leader">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    
+                    <div class="carousel-wrapper" id="leaderCarousel">
+                        {% for candidate in leader %}
+                        <div class="carousel-slide {% if loop.first %}active{% endif %}" data-id="{{ candidate.id }}" data-category="leader">
+                            <div class="card candidate-card shadow-lg h-100">
+                                <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                                     class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                                <div class="card-body">
+                                    <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
+                                    <p class="card-text"><small><strong>Gestor:</strong> {{ candidate.gestor }}</small></p>
+                                    <p class="card-text">{{ candidate.justificativa }}</p>
+                                    <button class="btn btn-outline-claro w-100 select-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}" data-category="leader">
+                                        Selecionar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <button class="carousel-nav carousel-next" data-category="leader">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="carousel-indicators" id="leaderIndicators">
+                    {% for candidate in leader %}
+                    <span class="indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></span>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
         {% endif %}
     </div>
@@ -83,17 +196,22 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-claro text-white">
-                <h5 class="modal-title">Confirmar Voto</h5>
+                <h5 class="modal-title">Confirmar Votação</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Você confirma seu voto em:</p>
-                <h4 class="text-claro" id="confirmName"></h4>
+                <p>Você confirma seus votos em:</p>
+                <div class="mb-3">
+                    <strong>Profissional:</strong> <span id="confirmProfessional"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Líder:</strong> <span id="confirmLeader"></span>
+                </div>
                 <p class="text-muted">Esta ação não pode ser desfeita.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-claro" id="confirmVoteBtn">Confirmar Voto</button>
+                <button type="button" class="btn btn-claro" id="confirmVoteBtn">Confirmar Votos</button>
             </div>
         </div>
     </div>

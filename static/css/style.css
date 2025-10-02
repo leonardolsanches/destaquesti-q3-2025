@@ -1,3 +1,4 @@
+
 :root {
     --claro-red: #8B1538;
     --claro-red-dark: #6B0F2A;
@@ -40,21 +41,149 @@ body {
     height: 40px;
 }
 
-.candidate-card {
-    transition: transform 0.3s, box-shadow 0.3s;
+/* Carousel Styles */
+.category-section {
+    margin-bottom: 3rem;
+}
+
+/* Desktop Grid - Show by default */
+.desktop-grid {
+    display: block;
+}
+
+.mobile-carousel {
+    display: none;
+}
+
+.carousel-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 50px;
+}
+
+.carousel-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 650px;
+    overflow: hidden;
+    touch-action: pan-y;
+}
+
+.carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s ease-in-out;
+    pointer-events: none;
+}
+
+.carousel-slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.carousel-slide.prev {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.carousel-nav {
+    background-color: var(--claro-red);
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.carousel-nav:hover {
+    background-color: var(--claro-red-dark);
+    transform: scale(1.1);
+}
+
+.carousel-nav:active {
+    transform: scale(0.95);
+}
+
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #ddd;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background-color: var(--claro-red);
+    width: 30px;
+    border-radius: 6px;
+}
+
+.candidate-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid #dee2e6;
+    position: relative;
+    height: 100%;
 }
 
 .candidate-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    border-color: var(--claro-red);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.candidate-card.selected {
+    border: 3px solid var(--claro-red) !important;
+    box-shadow: 0 8px 20px rgba(139, 21, 56, 0.3) !important;
+}
+
+.candidate-card.selected::before {
+    content: '✓';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: var(--claro-red);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .candidate-photo {
     width: 100%;
-    height: 200px;
+    height: 300px;
     object-fit: cover;
     border-bottom: 3px solid var(--claro-red);
 }
@@ -70,6 +199,11 @@ body {
 .card {
     border-radius: 10px;
     overflow: hidden;
+}
+
+.card-body {
+    overflow-y: auto;
+    max-height: 280px;
 }
 
 .card-header {
@@ -123,25 +257,65 @@ body {
     max-width: 20%;
 }
 
+/* Mobile Styles */
 @media (max-width: 992px) {
     .col-lg-2-4 {
         flex: 0 0 33.333333%;
         max-width: 33.333333%;
     }
-}
-
-@media (max-width: 576px) {
-    .col-lg-2-4 {
-        flex: 0 0 100%;
-        max-width: 100%;
+    
+    /* Hide desktop grid, show mobile carousel */
+    .desktop-grid {
+        display: none;
     }
     
-    #countdown {
-        font-size: 1.8rem;
+    .mobile-carousel {
+        display: block;
+    }
+    
+    .carousel-container {
+        padding: 0 10px;
+    }
+    
+    .carousel-nav {
+        display: none;
+    }
+    
+    .carousel-wrapper {
+        max-width: 100%;
+        height: 600px;
     }
     
     .candidate-photo {
-        height: 150px;
+        height: 250px;
+    }
+    
+    .mobile-instructions {
+        display: block !important;
+    }
+}
+
+@media (min-width: 993px) {
+    .mobile-instructions {
+        display: none !important;
+    }
+}
+
+@media (max-width: 576px) {
+    #countdown {
+        font-size: 1.8rem;
+    }
+
+    .candidate-photo {
+        height: 200px;
+    }
+    
+    .carousel-wrapper {
+        height: 550px;
+    }
+    
+    .card-body {
+        max-height: 250px;
     }
 }
 
@@ -165,4 +339,15 @@ body {
 
 .table-success {
     background-color: rgba(139, 21, 56, 0.1) !important;
+}
+
+.btn-outline-claro {
+    color: #8B1538;
+    border-color: #8B1538;
+}
+
+.btn-outline-claro:hover {
+    color: white;
+    background-color: #8B1538;
+    border-color: #8B1538;
 }

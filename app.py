@@ -299,9 +299,11 @@ def submit_vote():
         categoria = candidate.get('categoria', '')
         is_leader = 'Líder' in categoria
         
+        # Verificar se já votou e alertar, mas permitir atualização
         if dm.has_voted(email, candidate_id):
             categoria_nome = 'Líder' if is_leader else 'Profissional'
-            return jsonify({'success': False, 'error': f'Você já votou na categoria {categoria_nome}'})
+            # Não retornar erro, apenas continuar (permite atualizar voto)
+            pass
         
         dm.add_vote(candidate_id)
         if not dm.add_voter(email, candidate_id):
