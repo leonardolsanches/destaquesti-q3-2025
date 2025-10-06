@@ -42,13 +42,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for candidate in entry.candidates|sort(attribute='vote_count', reverse=True)[:5] %}
+                            {% set sorted_candidates = entry.candidates|sort(attribute='vote_count', reverse=True) %}
+                            {% for candidate in sorted_candidates %}
+                            {% if loop.index <= 5 %}
                             <tr>
                                 <td>{{ loop.index }}º</td>
                                 <td>{{ candidate.nome }}</td>
                                 <td>{{ candidate.categoria }}</td>
                                 <td><strong>{{ candidate.vote_count }}</strong></td>
                             </tr>
+                            {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>

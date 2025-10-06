@@ -9,6 +9,9 @@ document.getElementById('uploadExcelForm').addEventListener('submit', async (e) 
         return;
     }
 
+    // Mostrar loading
+    showMessage('Processando arquivo...', 'info');
+
     const formData = new FormData();
     formData.append('file', file);
 
@@ -21,13 +24,14 @@ document.getElementById('uploadExcelForm').addEventListener('submit', async (e) 
         const data = await response.json();
 
         if (data.success) {
-            showMessage(`Sucesso! ${data.added} novos candidatos adicionados, ${data.skipped} já existentes foram mantidos.`, 'success');
-            setTimeout(() => location.reload(), 1500);
+            const skipped = data.count - data.added;
+            showMessage(`✅ Sucesso! ${data.added} novo(s) candidato(s) adicionado(s). ${skipped > 0 ? skipped + ' já existente(s) foram mantido(s).' : ''}`, 'success');
+            setTimeout(() => location.reload(), 2000);
         } else {
-            showMessage(`Erro: ${data.error}`, 'danger');
+            showMessage(`❌ Erro: ${data.error}`, 'danger');
         }
     } catch (error) {
-        showMessage(`Erro: ${error.message}`, 'danger');
+        showMessage(`❌ Erro: ${error.message}`, 'danger');
     }
 });
 
@@ -384,116 +388,3 @@ function showAddCandidateMessage(message, type) {
     }, 5000);
 }
 
-// Modal de criação de candidato
-const createModal = `
-    <div class="modal fade" id="createCandidateModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Criar Novo Candidato</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="createCandidateForm">
-                        <div class="mb-3">
-                            <label class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="createNome" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Justificativa</label>
-                            <textarea class="form-control" id="createJustificativa" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Gestor</label>
-                            <input type="text" class="form-control" id="createGestor" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Período</label>
-                            <input type="text" class="form-control" id="createPeriodo" value="Q3/2025">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Categoria</label>
-                            <select class="form-control" id="createCategoria">
-                                <option value="Eu Faço a Diferença">Eu Faço a Diferença</option>
-                                <option value="Eu Faço a Diferença - Líder">Eu Faço a Diferença - Líder</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-success" id="saveNewCandidate">Criar Candidato</button>
-                </div>
-            </div>
-        </div>
-    </div>
-`;
-$('body').append(createModal);
-
-// Botão criar candidato
-$('#createCandidateBtn').click(function() {
-    $('#createCandidateModal').modal('show');
-});
-
-// Salvar novo candidato
-$('#saveNewCandidate').click(function() {
-    const candidateData = {
-        nome: $('#createNome').val().trim(),
-        justificativa: $('#createJustificativa').val().trim(),
-        gestor: $('#createGestor').val().trim(),
-        periodo: $('#createPeriodo').val().trim(),
-        categoria: $('#createCategoria').val()
-    };
-
-    if (!candidateData.nome || !candidateData.justificativa || !candidateData.gestor) {
-        alert('Por favor, preencha todos os campos obrigatórios.');
-        return;
-    }
-
-    $.ajax({
-        url: '/admin/create-candidate',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(candidateData),
-        success: function(response) {
-            if (response.success) {
-                alert('Candidato criado com sucesso!');
-                $('#createCandidateModal').modal('hide');
-                location.reload();
-            } else {
-                alert('Erro: ' + response.error);
-            }
-        },
-        error: function() {
-            alert('Erro ao criar candidato');
-        }
-    });
-});
-
-// Modal de edição
-    const editModal = `
-// Atualizar mensagem de importação Excel
-$(document).ready(function() {
-    $('#uploadExcelForm').submit(function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        $.ajax({
-            url: '/admin/upload-excel',
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                if (response.success) {
-                    alert(response.message || `${response.added} novos candidatos adicionados!`);
-                    location.reload();
-                } else {
-                    alert('Erro: ' + response.error);
-                }
-            },
-            error: function() {
-                alert('Erro ao importar arquivo.');
-            }
-        });
-    });
-});

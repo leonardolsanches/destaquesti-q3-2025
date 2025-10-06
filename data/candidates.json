@@ -128,5 +128,14 @@
     "photo": "20251002180618.png",
     "id": 13,
     "vote_count": 0
+  },
+  {
+    "nome": "Amaro Quintino Junior",
+    "justificativa": "Dedicação, análise e  controle financeiro Programa Solar e da renovação de licenças Sales Force. Apoio à Janaina Sousa com um dos principais programas da diretoria.",
+    "gestor": "Aline",
+    "periodo": "Q3/2025",
+    "categoria": "Eu Faço a Diferença",
+    "photo": "default_avatar.png",
+    "id": 14
   }
 ]
