@@ -142,7 +142,8 @@ document.getElementById('resetVotingBtn').addEventListener('click', async () => 
 
 const saveHistoryBtn = document.getElementById('saveHistoryBtn');
 if (saveHistoryBtn) {
-    const period = prompt('Digite o período desta votação (ex: Q3/2025):');
+    saveHistoryBtn.addEventListener('click', async () => {
+        const period = prompt('Digite o período desta votação (ex: Q3/2025):');
         if (!period) return;
 
         try {
