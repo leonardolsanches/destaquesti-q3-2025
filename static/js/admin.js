@@ -140,29 +140,31 @@ document.getElementById('resetVotingBtn').addEventListener('click', async () => 
     }
 });
 
-document.getElementById('saveHistoryBtn').addEventListener('click', async () => {
+const saveHistoryBtn = document.getElementById('saveHistoryBtn');
+if (saveHistoryBtn) {
     const period = prompt('Digite o período desta votação (ex: Q3/2025):');
-    if (!period) return;
+        if (!period) return;
 
-    try {
-        const response = await fetch('/admin/save-history', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ period })
-        });
+        try {
+            const response = await fetch('/admin/save-history', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ period })
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (data.success) {
-            alert('Histórico de votação salvo com sucesso!');
-            location.reload();
-        } else {
-            alert(`Erro: ${data.error}`);
+            if (data.success) {
+                alert('Histórico de votação salvo com sucesso!');
+                location.reload();
+            } else {
+                alert(`Erro: ${data.error}`);
+            }
+        } catch (error) {
+            alert(`Erro: ${error.message}`);
         }
-    } catch (error) {
-        alert(`Erro: ${error.message}`);
-    }
-});
+    });
+}
 
 document.getElementById('deleteAllCandidatesBtn').addEventListener('click', async () => {
     if (!confirm('ATENÇÃO: Isso irá excluir TODOS os candidatos carregados! Tem certeza?')) return;
@@ -319,11 +321,12 @@ pasteArea.addEventListener('paste', (e) => {
 document.addEventListener('paste', (e) => {
     const photoModal = document.getElementById('photoModal');
     if (photoModal && photoModal.classList.contains('show')) {
-        e.preventDefault();
         const items = e.clipboardData.items;
+        let imageFound = false;
 
         for (let i = 0; i < items.length; i++) {
             if (items[i].type.indexOf('image') !== -1) {
+                e.preventDefault();
                 const blob = items[i].getAsFile();
                 const reader = new FileReader();
 
@@ -333,7 +336,25 @@ document.addEventListener('paste', (e) => {
                 };
 
                 reader.readAsDataURL(blob);
+                imageFound = true;
                 break;
+            }
+        }
+
+        // Se não encontrou imagem diretamente, tentar pegar do clipboard como imagem
+        if (!imageFound && e.clipboardData.files && e.clipboardData.files.length > 0) {
+            for (let i = 0; i < e.clipboardData.files.length; i++) {
+                const file = e.clipboardData.files[i];
+                if (file.type.startsWith('image/')) {
+                    e.preventDefault();
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        pastedImage = event.target.result;
+                        pasteArea.innerHTML = `<img src="${pastedImage}" style="max-width: 100%; max-height: 200px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                    break;
+                }
             }
         }
     }

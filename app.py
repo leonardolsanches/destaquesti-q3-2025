@@ -165,9 +165,9 @@ def upload_photo():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/admin/create-candidate', methods=['POST'])
+@app.route('/admin/add-candidate', methods=['POST'])
 @require_admin_auth
-def create_candidate():
+def add_candidate():
     try:
         data = request.get_json()
         
@@ -258,6 +258,18 @@ def stop_voting():
 def reset_voting():
     try:
         dm.reset_voting()
+        return jsonify({'success': True})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/save-history', methods=['POST'])
+@require_admin_auth
+def save_history():
+    try:
+        data = request.get_json()
+        period = data.get('period', '')
+        dm.save_voting_to_history(period)
         return jsonify({'success': True})
     
     except Exception as e:
