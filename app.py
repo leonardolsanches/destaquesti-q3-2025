@@ -123,13 +123,15 @@ def upload_excel():
                 }
                 candidates.append(candidate)
         
-        dm.save_candidates([])
-        dm.reset_voting()
+        # Importar apenas novos candidatos, preservando os existentes
+        added_count = dm.import_candidates_preserving_existing(candidates)
         
-        for candidate in candidates:
-            dm.add_candidate(candidate)
-        
-        return jsonify({'success': True, 'count': len(candidates)})
+        return jsonify({
+            'success': True, 
+            'count': len(candidates),
+            'added': added_count,
+            'message': f'{added_count} novo(s) candidato(s) adicionado(s). Candidatos existentes foram preservados.'
+        })
     
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
@@ -159,6 +161,26 @@ def upload_photo():
                 return jsonify({'success': True, 'filename': filename})
         
         return jsonify({'success': False, 'error': 'Nenhuma foto enviada'})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/create-candidate', methods=['POST'])
+@require_admin_auth
+def create_candidate():
+    try:
+        data = request.get_json()
+        
+        new_candidate = {
+            'nome': data.get('nome', '').strip(),
+            'justificativa': data.get('justificativa', '').strip(),
+            'gestor': data.get('gestor', '').strip(),
+            'periodo': data.get('periodo', 'Q3/2025').strip(),
+            'categoria': data.get('categoria', 'Eu Faço a Diferença').strip()
+        }
+        
+        candidate = dm.add_candidate(new_candidate)
+        return jsonify({'success': True, 'candidate': candidate})
     
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
@@ -216,6 +238,13 @@ def set_voting_config():
 @require_admin_auth
 def stop_voting():
     try:
+        data = request.get_json() or {}
+        save_history = data.get('save_history', True)
+        
+        # Salvar no histórico antes de encerrar
+        if save_history:
+            dm.save_voting_to_history()
+        
         config = dm.get_config()
         config['voting_active'] = False
         dm.save_config(config)
@@ -352,6 +381,18 @@ def api_results():
 def api_config():
     config = dm.get_config()
     return jsonify(config)
+
+@app.route('/admin/voting-history')
+@require_admin_auth
+def voting_history():
+    history = dm.get_voting_history()
+    return render_template('voting_history.html', history=history)
+
+@app.route('/api/voting-history')
+@require_admin_auth
+def api_voting_history():
+    history = dm.get_voting_history()
+    return jsonify({'history': history})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

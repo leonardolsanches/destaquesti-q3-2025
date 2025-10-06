@@ -9,6 +9,7 @@ class DataManager:
         self.votes_file = os.path.join(self.data_dir, 'votes.json')
         self.config_file = os.path.join(self.data_dir, 'config.json')
         self.voters_file = os.path.join(self.data_dir, 'voters.json')
+        self.history_file = os.path.join(self.data_dir, 'voting_history.json')
 
         os.makedirs(self.data_dir, exist_ok=True)
         self._initialize_files()
@@ -28,6 +29,9 @@ class DataManager:
 
         if not os.path.exists(self.voters_file):
             self._save_json(self.voters_file, [])
+        
+        if not os.path.exists(self.history_file):
+            self._save_json(self.history_file, [])
 
     def _load_json(self, filepath):
         try:
@@ -48,11 +52,27 @@ class DataManager:
 
     def add_candidate(self, candidate):
         candidates = self.get_candidates()
-        candidate['id'] = len(candidates) + 1
+        # Gerar novo ID baseado no maior ID existente
+        max_id = max([c['id'] for c in candidates], default=0)
+        candidate['id'] = max_id + 1
         candidate['photo'] = candidate.get('photo', 'default_avatar.png')
         candidates.append(candidate)
         self.save_candidates(candidates)
         return candidate
+    
+    def import_candidates_preserving_existing(self, new_candidates):
+        """Importa novos candidatos preservando os existentes"""
+        existing = self.get_candidates()
+        existing_names = {c['nome'].lower().strip() for c in existing}
+        
+        added_count = 0
+        for new_candidate in new_candidates:
+            # Verificar se já existe pelo nome
+            if new_candidate['nome'].lower().strip() not in existing_names:
+                self.add_candidate(new_candidate)
+                added_count += 1
+        
+        return added_count
 
     def update_candidate(self, candidate_id, updated_data):
         candidates = self.get_candidates()
@@ -250,3 +270,32 @@ class DataManager:
         self._save_json(self.candidates_file, [])
         self._save_json(self.votes_file, {})
         self._save_json(self.voters_file, [])
+    
+    def save_voting_to_history(self, description=''):
+        """Salva o estado atual da votação no histórico"""
+        history = self._load_json(self.history_file)
+        
+        candidates = self.get_candidates()
+        votes = self.get_votes()
+        config = self.get_config()
+        
+        # Adicionar contagem de votos aos candidatos
+        for candidate in candidates:
+            candidate['vote_count'] = votes.get(str(candidate['id']), 0)
+        
+        history_entry = {
+            'timestamp': datetime.now().isoformat(),
+            'description': description or f"Votação encerrada em {datetime.now().strftime('%d/%m/%Y %H:%M')}",
+            'config': config,
+            'candidates': candidates,
+            'total_voters': len(self.get_voters()),
+            'total_votes': sum(votes.values())
+        }
+        
+        history.append(history_entry)
+        self._save_json(self.history_file, history)
+        return len(history)
+    
+    def get_voting_history(self):
+        """Recupera o histórico de votações"""
+        return self._load_json(self.history_file)

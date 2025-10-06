@@ -1,0 +1,94 @@
+
+{% extends "base.html" %}
+
+{% block title %}Histórico de Votações{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-claro">Histórico de Votações</h1>
+        <a href="{{ url_for('admin') }}" class="btn btn-secondary">Voltar ao Admin</a>
+    </div>
+
+    {% if history %}
+        {% for entry in history|reverse %}
+        <div class="card shadow mb-4">
+            <div class="card-header bg-claro text-white">
+                <h5 class="mb-0">{{ entry.description }}</h5>
+                <small>{{ entry.timestamp }}</small>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Total de Votantes:</strong> {{ entry.total_voters }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Total de Votos:</strong> {{ entry.total_votes }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Candidatos:</strong> {{ entry.candidates|length }}
+                    </div>
+                </div>
+
+                <h6 class="mt-4">Top 5 Resultados:</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Posição</th>
+                                <th>Nome</th>
+                                <th>Categoria</th>
+                                <th>Votos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for candidate in entry.candidates|sort(attribute='vote_count', reverse=True)[:5] %}
+                            <tr>
+                                <td>{{ loop.index }}º</td>
+                                <td>{{ candidate.nome }}</td>
+                                <td>{{ candidate.categoria }}</td>
+                                <td><strong>{{ candidate.vote_count }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-sm btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ loop.index0 }}">
+                    Ver Todos os Resultados
+                </button>
+
+                <div class="collapse mt-3" id="details-{{ loop.index0 }}">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Gestor</th>
+                                    <th>Categoria</th>
+                                    <th>Votos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for candidate in entry.candidates|sort(attribute='vote_count', reverse=True) %}
+                                <tr>
+                                    <td>{{ candidate.nome }}</td>
+                                    <td>{{ candidate.gestor }}</td>
+                                    <td>{{ candidate.categoria }}</td>
+                                    <td>{{ candidate.vote_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            Nenhum histórico de votação encontrado.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
