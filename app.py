@@ -224,6 +224,14 @@ def set_voting_config():
         data = request.get_json()
         end_date = data.get('end_date')
         
+        # Validar se a data é futura
+        try:
+            end_datetime = datetime.fromisoformat(end_date)
+            if end_datetime <= datetime.now():
+                return jsonify({'success': False, 'error': 'A data de encerramento deve ser no futuro!'})
+        except ValueError:
+            return jsonify({'success': False, 'error': 'Data inválida!'})
+        
         config = dm.get_config()
         config['voting_end_date'] = end_date
         config['voting_active'] = True
