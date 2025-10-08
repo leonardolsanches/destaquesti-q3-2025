@@ -71,8 +71,12 @@ document.getElementById('votingConfigForm').addEventListener('submit', async (e)
 
     const endDate = document.getElementById('endDate').value;
 
-    if (!endDate) {
-        alert('Por favor, selecione uma data e hora');
+    // Validar data no cliente também
+    const selectedDate = new Date(endDate);
+    const now = new Date();
+
+    if (selectedDate <= now) {
+        alert('ATENÇÃO: A data de encerramento deve ser no futuro!\n\nPor favor, selecione uma data e hora posterior ao momento atual.');
         return;
     }
 
@@ -80,13 +84,13 @@ document.getElementById('votingConfigForm').addEventListener('submit', async (e)
         const response = await fetch('/admin/set-voting-config', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ end_date: endDate })
+            body: JSON.stringify({end_date: endDate})
         });
 
         const data = await response.json();
 
         if (data.success) {
-            alert('Votação iniciada com sucesso!');
+            alert('✓ Votação iniciada com sucesso!\n\nOs usuários já podem acessar a página de votação.');
             location.reload();
         } else {
             alert(`Erro: ${data.error}`);
@@ -409,4 +413,3 @@ function showAddCandidateMessage(message, type) {
         messageDiv.innerHTML = '';
     }, 5000);
 }
-
