@@ -1,197 +1,259 @@
+
 import json
-import os
 from datetime import datetime
+from database import get_db_connection, init_database
 
 class DataManager:
     def __init__(self):
-        self.data_dir = 'data'
-        self.candidates_file = os.path.join(self.data_dir, 'candidates.json')
-        self.votes_file = os.path.join(self.data_dir, 'votes.json')
-        self.config_file = os.path.join(self.data_dir, 'config.json')
-        self.voters_file = os.path.join(self.data_dir, 'voters.json')
-        self.history_file = os.path.join(self.data_dir, 'voting_history.json')
-
-        os.makedirs(self.data_dir, exist_ok=True)
-        self._initialize_files()
-
-    def _initialize_files(self):
-        if not os.path.exists(self.candidates_file):
-            self._save_json(self.candidates_file, [])
-
-        if not os.path.exists(self.votes_file):
-            self._save_json(self.votes_file, {})
-
-        if not os.path.exists(self.config_file):
-            self._save_json(self.config_file, {
-                'voting_end_date': None,
-                'voting_active': False
-            })
-
-        if not os.path.exists(self.voters_file):
-            self._save_json(self.voters_file, [])
-        
-        if not os.path.exists(self.history_file):
-            self._save_json(self.history_file, [])
-
-    def _load_json(self, filepath):
+        # Inicializar banco de dados
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            return [] if 'candidates' in filepath or 'voters' in filepath else {}
-
-    def _save_json(self, filepath, data):
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+            init_database()
+        except Exception as e:
+            print(f"Erro ao inicializar banco: {e}")
+            raise
 
     def get_candidates(self):
-        return self._load_json(self.candidates_file)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM candidates ORDER BY id')
+        candidates = [dict(row) for row in cur.fetchall()]
+        cur.close()
+        conn.close()
+        return candidates
 
     def save_candidates(self, candidates):
-        self._save_json(self.candidates_file, candidates)
+        # Não usado mais, mas mantido para compatibilidade
+        pass
 
     def add_candidate(self, candidate):
-        candidates = self.get_candidates()
-        # Gerar novo ID baseado no maior ID existente
-        max_id = max([c['id'] for c in candidates], default=0)
-        candidate['id'] = max_id + 1
-        candidate['photo'] = candidate.get('photo', 'default_avatar.png')
-        candidates.append(candidate)
-        self.save_candidates(candidates)
-        return candidate
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        cur.execute('''
+            INSERT INTO candidates (nome, justificativa, gestor, periodo, categoria, photo)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING id, nome, justificativa, gestor, periodo, categoria, photo
+        ''', (
+            candidate.get('nome'),
+            candidate.get('justificativa', ''),
+            candidate.get('gestor', ''),
+            candidate.get('periodo', 'Q3/2025'),
+            candidate.get('categoria', 'Eu Faço a Diferença'),
+            candidate.get('photo', 'default_avatar.png')
+        ))
+        
+        new_candidate = dict(cur.fetchone())
+        
+        # Inicializar contagem de votos
+        cur.execute('''
+            INSERT INTO votes (candidate_id, count) VALUES (%s, 0)
+            ON CONFLICT (candidate_id) DO NOTHING
+        ''', (new_candidate['id'],))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        return new_candidate
     
     def import_candidates_preserving_existing(self, new_candidates):
-        """Importa novos candidatos preservando os existentes"""
-        existing = self.get_candidates()
-        existing_names = {c['nome'].lower().strip() for c in existing}
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        # Obter nomes existentes
+        cur.execute('SELECT LOWER(TRIM(nome)) as nome FROM candidates')
+        existing_names = {row['nome'] for row in cur.fetchall()}
         
         added_count = 0
         for new_candidate in new_candidates:
-            # Verificar se já existe pelo nome
             if new_candidate['nome'].lower().strip() not in existing_names:
                 self.add_candidate(new_candidate)
                 added_count += 1
         
+        cur.close()
+        conn.close()
         return added_count
 
     def update_candidate(self, candidate_id, updated_data):
-        candidates = self.get_candidates()
-        for candidate in candidates:
-            if candidate['id'] == candidate_id:
-                candidate.update(updated_data)
-                break
-        self.save_candidates(candidates)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        set_clause = ', '.join([f"{k} = %s" for k in updated_data.keys()])
+        values = list(updated_data.values()) + [candidate_id]
+        
+        cur.execute(f'UPDATE candidates SET {set_clause} WHERE id = %s', values)
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def delete_candidate(self, candidate_id):
-        candidates = self.get_candidates()
-        candidates = [c for c in candidates if c['id'] != candidate_id]
-        self.save_candidates(candidates)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM candidates WHERE id = %s', (candidate_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def get_votes(self):
-        votes = self._load_json(self.votes_file)
-        return votes if isinstance(votes, dict) else {}
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT candidate_id, count FROM votes')
+        votes = {str(row['candidate_id']): row['count'] for row in cur.fetchall()}
+        cur.close()
+        conn.close()
+        return votes
 
     def add_vote(self, candidate_id):
-        votes = self.get_votes()
-        candidate_id_str = str(candidate_id)
-        votes[candidate_id_str] = votes.get(candidate_id_str, 0) + 1
-        self._save_json(self.votes_file, votes)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            INSERT INTO votes (candidate_id, count) VALUES (%s, 1)
+            ON CONFLICT (candidate_id) DO UPDATE SET count = votes.count + 1
+        ''', (candidate_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def remove_vote(self, candidate_id):
-        """Remove um voto de um candidato específico"""
-        candidates = self.get_candidates()
-        for candidate in candidates:
-            if candidate['id'] == candidate_id:
-                candidate['vote_count'] = max(0, candidate.get('vote_count', 0) - 1)
-        self.save_candidates(candidates)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            UPDATE votes SET count = GREATEST(0, count - 1)
+            WHERE candidate_id = %s
+        ''', (candidate_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def get_vote_count(self, candidate_id):
-        votes = self.get_votes()
-        return votes.get(str(candidate_id), 0)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT count FROM votes WHERE candidate_id = %s', (candidate_id,))
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return result['count'] if result else 0
 
     def get_voters(self):
-        return self._load_json(self.voters_file)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM voters')
+        voters = [dict(row) for row in cur.fetchall()]
+        cur.close()
+        conn.close()
+        return voters
 
     def save_voters(self, voters):
-        self._save_json(self.voters_file, voters)
+        # Não usado mais
+        pass
 
     def add_voter(self, email, candidate_id):
-        voters = self.get_voters()
-        candidates = self.get_candidates()
-
-        candidate = next((c for c in candidates if c['id'] == candidate_id), None)
-        if not candidate:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        # Obter categoria do candidato
+        cur.execute('SELECT categoria FROM candidates WHERE id = %s', (candidate_id,))
+        result = cur.fetchone()
+        if not result:
+            cur.close()
+            conn.close()
             return False
-
-        is_leader = 'Líder' in candidate.get('categoria', '')
-
-        existing_voter = next((v for v in voters if v['email'] == email), None)
-
+        
+        is_leader = 'Líder' in result['categoria']
+        
+        # Verificar se eleitor já existe
+        cur.execute('SELECT * FROM voters WHERE email = %s', (email,))
+        existing_voter = cur.fetchone()
+        
         if existing_voter:
-            # Atualizar voto existente ou adicionar novo voto na categoria
             if is_leader:
-                # Se já votou em líder, remover voto anterior
                 old_leader_id = existing_voter.get('leader_id')
                 if old_leader_id:
                     self.remove_vote(old_leader_id)
-                existing_voter['leader_id'] = candidate_id
-                existing_voter['voted_leader'] = True
+                cur.execute('''
+                    UPDATE voters SET leader_id = %s, voted_leader = TRUE
+                    WHERE email = %s
+                ''', (candidate_id, email))
             else:
-                # Se já votou em profissional, remover voto anterior
                 old_professional_id = existing_voter.get('professional_id')
                 if old_professional_id:
                     self.remove_vote(old_professional_id)
-                existing_voter['professional_id'] = candidate_id
-                existing_voter['voted_professional'] = True
+                cur.execute('''
+                    UPDATE voters SET professional_id = %s, voted_professional = TRUE
+                    WHERE email = %s
+                ''', (candidate_id, email))
         else:
-            # Novo eleitor
-            new_voter = {
-                'email': email,
-                'voted_professional': False,
-                'voted_leader': False
-            }
             if is_leader:
-                new_voter['leader_id'] = candidate_id
-                new_voter['voted_leader'] = True
+                cur.execute('''
+                    INSERT INTO voters (email, leader_id, voted_leader)
+                    VALUES (%s, %s, TRUE)
+                ''', (email, candidate_id))
             else:
-                new_voter['professional_id'] = candidate_id
-                new_voter['voted_professional'] = True
-            voters.append(new_voter)
-
-        self.save_voters(voters)
+                cur.execute('''
+                    INSERT INTO voters (email, professional_id, voted_professional)
+                    VALUES (%s, %s, TRUE)
+                ''', (email, candidate_id))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
         return True
 
     def has_voted(self, email, candidate_id):
-        voters = self.get_voters()
-        candidates = self.get_candidates()
-
-        candidate = next((c for c in candidates if c['id'] == candidate_id), None)
-        if not candidate:
-            return False
-
-        is_leader = 'Líder' in candidate.get('categoria', '')
-
-        for voter in voters:
-            if voter['email'] == email:
-                if is_leader:
-                    # Retorna o ID do candidato líder votado ou None
-                    return voter.get('leader_id')
-                else:
-                    # Retorna o ID do candidato profissional votado ou None
-                    return voter.get('professional_id')
-
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        cur.execute('SELECT categoria FROM candidates WHERE id = %s', (candidate_id,))
+        result = cur.fetchone()
+        if not result:
+            cur.close()
+            conn.close()
+            return None
+        
+        is_leader = 'Líder' in result['categoria']
+        
+        cur.execute('SELECT * FROM voters WHERE email = %s', (email,))
+        voter = cur.fetchone()
+        
+        cur.close()
+        conn.close()
+        
+        if voter:
+            return voter.get('leader_id') if is_leader else voter.get('professional_id')
         return None
 
     def get_config(self):
-        return self._load_json(self.config_file)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM config WHERE id = 1')
+        config = dict(cur.fetchone())
+        
+        # Converter timestamp para string ISO
+        if config.get('voting_end_date'):
+            config['voting_end_date'] = config['voting_end_date'].isoformat()
+        
+        cur.close()
+        conn.close()
+        return config
 
     def save_config(self, config):
-        self._save_json(self.config_file, config)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        cur.execute('''
+            UPDATE config SET 
+                voting_end_date = %s,
+                voting_active = %s,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = 1
+        ''', (config.get('voting_end_date'), config.get('voting_active')))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def is_voting_active(self):
         config = self.get_config()
         
-        # Primeiro verifica se está marcado como ativo
         if not config.get('voting_active', False):
             return False
 
@@ -200,14 +262,11 @@ class DataManager:
             return False
 
         try:
-            # Parse da data de encerramento
             end_date = datetime.fromisoformat(end_date_str.replace('Z', '+00:00'))
             now = datetime.now()
             
-            # Se a data atual for menor que a data de encerramento, está ativo
             is_active = now < end_date
             
-            # Se passou da data, desativar automaticamente
             if not is_active and config.get('voting_active'):
                 config['voting_active'] = False
                 self.save_config(config)
@@ -227,11 +286,9 @@ class DataManager:
         professional = [c for c in candidates if 'Líder' not in c.get('categoria', '')]
         leader = [c for c in candidates if 'Líder' in c.get('categoria', '')]
 
-        # Para resultados, manter ordenação por votos
         professional.sort(key=lambda x: x['vote_count'], reverse=True)
         leader.sort(key=lambda x: x['vote_count'], reverse=True)
 
-        # Para exibição geral, criar listas ordenadas alfabeticamente
         professional_alpha = sorted(professional, key=lambda x: x['nome'])
         leader_alpha = sorted(leader, key=lambda x: x['nome'])
 
@@ -272,44 +329,61 @@ class DataManager:
         }
 
     def reset_voting(self):
-        """Reseta votos e votantes, mantém candidatos"""
-        self.save_voters([])
-        self._save_json(self.votes_file, {})
-        candidates = self.get_candidates()
-        for candidate in candidates:
-            candidate['vote_count'] = 0
-        self.save_candidates(candidates)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM voters')
+        cur.execute('UPDATE votes SET count = 0')
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def delete_all_candidates(self):
-        self._save_json(self.candidates_file, [])
-        self._save_json(self.votes_file, {})
-        self._save_json(self.voters_file, [])
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM candidates')
+        cur.execute('DELETE FROM votes')
+        cur.execute('DELETE FROM voters')
+        conn.commit()
+        cur.close()
+        conn.close()
     
     def save_voting_to_history(self, description=''):
-        """Salva o estado atual da votação no histórico"""
-        history = self._load_json(self.history_file)
+        conn = get_db_connection()
+        cur = conn.cursor()
         
         candidates = self.get_candidates()
         votes = self.get_votes()
         config = self.get_config()
         
-        # Adicionar contagem de votos aos candidatos
         for candidate in candidates:
             candidate['vote_count'] = votes.get(str(candidate['id']), 0)
         
-        history_entry = {
-            'timestamp': datetime.now().isoformat(),
-            'description': description or f"Votação encerrada em {datetime.now().strftime('%d/%m/%Y %H:%M')}",
-            'config': config,
-            'candidates': candidates,
-            'total_voters': len(self.get_voters()),
-            'total_votes': sum(votes.values())
-        }
+        cur.execute('''
+            INSERT INTO voting_history (description, config, candidates, total_voters, total_votes)
+            VALUES (%s, %s, %s, %s, %s)
+        ''', (
+            description or f"Votação encerrada em {datetime.now().strftime('%d/%m/%Y %H:%M')}",
+            json.dumps(config),
+            json.dumps(candidates),
+            len(self.get_voters()),
+            sum(votes.values())
+        ))
         
-        history.append(history_entry)
-        self._save_json(self.history_file, history)
-        return len(history)
+        conn.commit()
+        cur.close()
+        conn.close()
     
     def get_voting_history(self):
-        """Recupera o histórico de votações"""
-        return self._load_json(self.history_file)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM voting_history ORDER BY timestamp DESC')
+        history = [dict(row) for row in cur.fetchall()]
+        
+        # Converter timestamps para strings
+        for entry in history:
+            if entry.get('timestamp'):
+                entry['timestamp'] = entry['timestamp'].isoformat()
+        
+        cur.close()
+        conn.close()
+        return history
