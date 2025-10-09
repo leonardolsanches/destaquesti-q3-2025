@@ -9,6 +9,19 @@
         <a href="{{ url_for('voting_history') }}" class="btn btn-info">Ver Histórico de Votações</a>
     </div>
 
+    <div class="card shadow mb-4">
+        <div class="card-header bg-claro text-white">
+            <h5 class="mb-0">🔗 Compartilhar Votação</h5>
+        </div>
+        <div class="card-body text-center">
+            <p><strong>URL da Votação:</strong></p>
+            <input type="text" class="form-control mb-3" id="votingUrl" value="https://dev-flow-boem.onrender.com/vote" readonly>
+            <button class="btn btn-claro mb-3" onclick="copyUrl()">📋 Copiar URL</button>
+            <div id="qrcode" class="d-flex justify-content-center"></div>
+            <p class="text-muted mt-2"><small>Compartilhe este QR Code para facilitar o acesso à votação</small></p>
+        </div>
+    </div>
+
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card shadow">
@@ -78,6 +91,10 @@
             <button id="resetVotingBtn" class="btn btn-warning w-100 mt-2">Zerar Votos (mantém candidatos)</button>
             <button id="saveHistoryBtn" class="btn btn-info w-100 mt-2">Salvar no Histórico</button>
             <button id="deleteAllCandidatesBtn" class="btn btn-danger w-100 mt-2">Excluir Todos os Indicados</button>
+            <hr>
+            <a href="/admin/export-candidates" class="btn btn-success w-100 mt-2">📥 Exportar Backup de Candidatos</a>
+            <button id="importBackupBtn" class="btn btn-primary w-100 mt-2">📤 Importar Backup de Candidatos</button>
+            <input type="file" id="backupFile" accept=".json" style="display: none;">
             
             {% if config.voting_active %}
             <div class="alert alert-success mt-3">
@@ -195,5 +212,25 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>
+// Gerar QR Code
+new QRCode(document.getElementById("qrcode"), {
+    text: "https://dev-flow-boem.onrender.com/vote",
+    width: 200,
+    height: 200,
+    colorDark: "#8B1538",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+});
+
+function copyUrl() {
+    const urlInput = document.getElementById('votingUrl');
+    urlInput.select();
+    urlInput.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    alert('✅ URL copiada para a área de transferência!');
+}
+</script>
 {% endblock %}

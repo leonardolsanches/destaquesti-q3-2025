@@ -293,6 +293,57 @@ def delete_all_candidates():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/admin/export-candidates')
+@require_admin_auth
+def export_candidates():
+    try:
+        candidates = dm.get_candidates()
+        
+        # Criar backup JSON com timestamp
+        backup_data = {
+            'timestamp': datetime.now().isoformat(),
+            'candidates': candidates
+        }
+        
+        return jsonify(backup_data), 200, {
+            'Content-Disposition': f'attachment; filename=backup_candidatos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json',
+            'Content-Type': 'application/json'
+        }
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/admin/import-backup', methods=['POST'])
+@require_admin_auth
+def import_backup():
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'Nenhum arquivo enviado'})
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'Nenhum arquivo selecionado'})
+        
+        # Ler o arquivo JSON
+        backup_data = json.load(file.stream)
+        
+        if 'candidates' not in backup_data:
+            return jsonify({'success': False, 'error': 'Arquivo de backup inválido'})
+        
+        candidates = backup_data['candidates']
+        
+        # Importar preservando candidatos existentes
+        added_count = dm.import_candidates_preserving_existing(candidates)
+        
+        return jsonify({
+            'success': True,
+            'count': len(candidates),
+            'added': added_count,
+            'message': f'{added_count} candidato(s) importado(s) do backup. Candidatos existentes preservados.'
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/api/candidate/<int:candidate_id>')
 @require_admin_auth
 def get_candidate(candidate_id):
@@ -384,13 +435,15 @@ def api_results():
     
     candidates_data = []
     for candidate in all_candidates:
-        candidates_data.append({
-            'id': candidate['id'],
-            'nome': candidate['nome'],
-            'vote_count': candidate['vote_count'],
-            'categoria': candidate['categoria'],
-            'photo': candidate['photo']
-        })
+        # Validar que o candidato tem dados essenciais
+        if candidate.get('id') and candidate.get('nome'):
+            candidates_data.append({
+                'id': candidate['id'],
+                'nome': candidate['nome'],
+                'vote_count': candidate.get('vote_count', 0),
+                'categoria': candidate.get('categoria', ''),
+                'photo': candidate.get('photo', 'default_avatar.png')
+            })
     
     return jsonify({
         'candidates': candidates_data,

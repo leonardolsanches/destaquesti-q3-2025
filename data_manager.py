@@ -190,6 +190,8 @@ class DataManager:
 
     def is_voting_active(self):
         config = self.get_config()
+        
+        # Primeiro verifica se está marcado como ativo
         if not config.get('voting_active', False):
             return False
 
@@ -198,9 +200,21 @@ class DataManager:
             return False
 
         try:
-            end_date = datetime.fromisoformat(end_date_str)
-            return datetime.now() < end_date
-        except:
+            # Parse da data de encerramento
+            end_date = datetime.fromisoformat(end_date_str.replace('Z', '+00:00'))
+            now = datetime.now()
+            
+            # Se a data atual for menor que a data de encerramento, está ativo
+            is_active = now < end_date
+            
+            # Se passou da data, desativar automaticamente
+            if not is_active and config.get('voting_active'):
+                config['voting_active'] = False
+                self.save_config(config)
+            
+            return is_active
+        except Exception as e:
+            print(f"Erro ao verificar data de votação: {e}")
             return False
 
     def get_results(self):

@@ -71,14 +71,18 @@ document.getElementById('votingConfigForm').addEventListener('submit', async (e)
 
     const endDate = document.getElementById('endDate').value;
 
-    // Validar data no cliente também
+    // Validar data no cliente - convertendo para timestamp para comparação precisa
     const selectedDate = new Date(endDate);
     const now = new Date();
 
-    if (selectedDate <= now) {
+    if (selectedDate.getTime() <= now.getTime()) {
         alert('ATENÇÃO: A data de encerramento deve ser no futuro!\n\nPor favor, selecione uma data e hora posterior ao momento atual.');
         return;
     }
+
+    // Mostrar confirmação com a data formatada
+    const confirmMsg = `Confirma iniciar votação com encerramento em:\n${selectedDate.toLocaleString('pt-BR')}?`;
+    if (!confirm(confirmMsg)) return;
 
     try {
         const response = await fetch('/admin/set-voting-config', {
@@ -412,4 +416,44 @@ function showAddCandidateMessage(message, type) {
     setTimeout(() => {
         messageDiv.innerHTML = '';
     }, 5000);
+}
+
+// Importar Backup
+const importBackupBtn = document.getElementById('importBackupBtn');
+const backupFileInput = document.getElementById('backupFile');
+
+if (importBackupBtn) {
+    importBackupBtn.addEventListener('click', () => {
+        backupFileInput.click();
+    });
+}
+
+if (backupFileInput) {
+    backupFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/admin/import-backup', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(`✅ ${data.message}`);
+                location.reload();
+            } else {
+                alert(`❌ Erro: ${data.error}`);
+            }
+        } catch (error) {
+            alert(`❌ Erro: ${error.message}`);
+        }
+
+        backupFileInput.value = '';
+    });
 }

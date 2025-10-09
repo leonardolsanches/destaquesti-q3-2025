@@ -6,11 +6,19 @@ async function loadResults() {
         const response = await fetch('/api/results');
         const data = await response.json();
         
-        const professional = data.candidates.filter(c => !c.categoria.includes('Líder'));
-        const leader = data.candidates.filter(c => c.categoria.includes('Líder'));
+        // Filtrar apenas candidatos válidos (com dados completos)
+        const validCandidates = data.candidates.filter(c => c && c.nome && c.id);
         
-        updateChart(professional, 'professional');
-        updateChart(leader, 'leader');
+        const professional = validCandidates.filter(c => !c.categoria.includes('Líder'));
+        const leader = validCandidates.filter(c => c.categoria.includes('Líder'));
+        
+        // Só atualizar gráficos se houver candidatos
+        if (professional.length > 0) {
+            updateChart(professional, 'professional');
+        }
+        if (leader.length > 0) {
+            updateChart(leader, 'leader');
+        }
         
         if (data.is_active) {
             setTimeout(loadResults, 5000);
