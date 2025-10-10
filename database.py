@@ -36,6 +36,23 @@ def init_database():
         )
     ''')
     
+    # Migração: Alterar colunas VARCHAR para TEXT se existirem
+    try:
+        cur.execute('''
+            ALTER TABLE candidates 
+            ALTER COLUMN nome TYPE TEXT,
+            ALTER COLUMN justificativa TYPE TEXT,
+            ALTER COLUMN gestor TYPE TEXT,
+            ALTER COLUMN periodo TYPE TEXT,
+            ALTER COLUMN categoria TYPE TEXT,
+            ALTER COLUMN photo TYPE TEXT
+        ''')
+        print("✅ Colunas da tabela candidates migradas para TEXT")
+    except Exception as e:
+        # Se falhar, provavelmente já são TEXT
+        conn.rollback()
+        pass
+    
     # Tabela de votos
     cur.execute('''
         CREATE TABLE IF NOT EXISTS votes (
@@ -58,6 +75,14 @@ def init_database():
             voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    
+    # Migração: Alterar coluna email para TEXT se existir como VARCHAR
+    try:
+        cur.execute('ALTER TABLE voters ALTER COLUMN email TYPE TEXT')
+        print("✅ Coluna email da tabela voters migrada para TEXT")
+    except Exception as e:
+        conn.rollback()
+        pass
     
     # Tabela de configuração
     cur.execute('''
