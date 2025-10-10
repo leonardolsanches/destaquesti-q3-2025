@@ -44,20 +44,17 @@ def process_image(image_file):
     
     img.thumbnail((400, 400), Image.Resampling.LANCZOS)
     
-    filename = secure_filename(f"{datetime.now().strftime('%Y%m%d%H%M%S')}.png")
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    
-    # Garantir que o diretório existe
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    
+    # Salvar como base64 em vez de arquivo
+    buffer = io.BytesIO()
     if img.mode == 'RGBA':
-        img.save(filepath, 'PNG', optimize=True)
+        img.save(buffer, 'PNG', optimize=True)
     else:
-        img.save(filepath, 'PNG', optimize=True)
+        img.save(buffer, 'PNG', optimize=True)
     
-    print(f"Imagem salva em: {filepath}")  # Log para debug
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
     
-    return filename
+    return f"data:image/png;base64,{image_base64}"
 
 @app.route('/')
 def index():
@@ -150,21 +147,24 @@ def upload_photo():
         
         if 'photo' in request.files and request.files['photo'].filename:
             file = request.files['photo']
-            filename = process_image(file)
-            dm.update_candidate(candidate_id, {'photo': filename})
-            return jsonify({'success': True, 'filename': filename})
+            photo_base64 = process_image(file)
+            dm.update_candidate(candidate_id, {'photo': photo_base64})
+            return jsonify({'success': True, 'photo_data': photo_base64})
         
         elif 'photo_base64' in request.form:
             photo_data = request.form.get('photo_base64', '')
-            if photo_data and photo_data.startswith('data:image'):
-                photo_data = photo_data.split(',')[1]
             
             if photo_data:
-                image_data = base64.b64decode(photo_data)
-                image_file = io.BytesIO(image_data)
-                filename = process_image(image_file)
-                dm.update_candidate(candidate_id, {'photo': filename})
-                return jsonify({'success': True, 'filename': filename})
+                if not photo_data.startswith('data:image'):
+                    image_data = base64.b64decode(photo_data)
+                    image_file = io.BytesIO(image_data)
+                    photo_base64 = process_image(image_file)
+                else:
+                    # Se já está no formato correto, usar direto
+                    photo_base64 = photo_data
+                
+                dm.update_candidate(candidate_id, {'photo': photo_base64})
+                return jsonify({'success': True, 'photo_data': photo_base64})
         
         return jsonify({'success': False, 'error': 'Nenhuma foto enviada'})
     

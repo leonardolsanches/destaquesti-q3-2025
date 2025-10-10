@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}Votação Destaques Q3/2025{% endblock %}
@@ -8,7 +7,7 @@
     <div class="text-center mb-4">
         <h1 class="display-4 text-claro mb-3">Votação Destaques Q3/2025</h1>
         <h3 class="text-muted">Diretoria Sistemas de Negócio</h3>
-        
+
         <div class="alert alert-info mt-4" role="alert">
             <h5>⏰ Tempo restante:</h5>
             <h2 id="countdown" class="text-claro mb-0">Carregando...</h2>
@@ -33,7 +32,7 @@
 
     <div id="votingSection" style="display: none;">
         <h3 class="text-center mb-4 text-claro">Selecione seus candidatos favoritos</h3>
-        
+
         <div class="alert alert-info text-center mb-4 mobile-instructions">
             <strong>Mobile:</strong> Arraste para os lados para navegar. Toque 2x no card para selecionar.<br>
             <strong>Desktop:</strong> Use as setas ou clique em "Selecionar"
@@ -57,18 +56,18 @@
                 </button>
             </div>
         </div>
-        
+
         {% if professional %}
         <div class="category-section mb-5">
             <h4 class="mb-3 text-center">Categoria: Eu Faço a Diferença - Profissional</h4>
-            
+
             <!-- Desktop Grid View -->
             <div class="desktop-grid">
                 <div class="row g-3">
                     {% for candidate in professional %}
                     <div class="col-md-6 col-lg-4 col-xl-3">
                         <div class="card candidate-card shadow-lg h-100" data-id="{{ candidate.id }}" data-category="professional">
-                            <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                            <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
                                  class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
                             <div class="card-body">
                                 <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
@@ -83,19 +82,19 @@
                     {% endfor %}
                 </div>
             </div>
-            
+
             <!-- Mobile Carousel View -->
             <div class="mobile-carousel">
                 <div class="carousel-container">
                     <button class="carousel-nav carousel-prev" data-category="professional">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    
+
                     <div class="carousel-wrapper" id="professionalCarousel">
                         {% for candidate in professional %}
                         <div class="carousel-slide {% if loop.first %}active{% endif %}" data-id="{{ candidate.id }}" data-category="professional">
                             <div class="card candidate-card shadow-lg h-100">
-                                <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                                <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
                                      class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
                                 <div class="card-body">
                                     <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
@@ -109,12 +108,12 @@
                         </div>
                         {% endfor %}
                     </div>
-                    
+
                     <button class="carousel-nav carousel-next" data-category="professional">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
-                
+
                 <div class="carousel-indicators" id="professionalIndicators">
                     {% for candidate in professional %}
                     <span class="indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></span>
@@ -127,14 +126,14 @@
         {% if leader %}
         <div class="category-section">
             <h4 class="mb-3 text-center">Categoria: Eu Faço a Diferença - Líder</h4>
-            
+
             <!-- Desktop Grid View -->
             <div class="desktop-grid">
                 <div class="row g-3">
                     {% for candidate in leader %}
                     <div class="col-md-6 col-lg-4 col-xl-3">
                         <div class="card candidate-card shadow-lg h-100" data-id="{{ candidate.id }}" data-category="leader">
-                            <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                            <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
                                  class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
                             <div class="card-body">
                                 <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
@@ -149,19 +148,19 @@
                     {% endfor %}
                 </div>
             </div>
-            
+
             <!-- Mobile Carousel View -->
             <div class="mobile-carousel">
                 <div class="carousel-container">
                     <button class="carousel-nav carousel-prev" data-category="leader">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    
+
                     <div class="carousel-wrapper" id="leaderCarousel">
                         {% for candidate in leader %}
                         <div class="carousel-slide {% if loop.first %}active{% endif %}" data-id="{{ candidate.id }}" data-category="leader">
                             <div class="card candidate-card shadow-lg h-100">
-                                <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                                <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
                                      class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
                                 <div class="card-body">
                                     <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
@@ -175,12 +174,12 @@
                         </div>
                         {% endfor %}
                     </div>
-                    
+
                     <button class="carousel-nav carousel-next" data-category="leader">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
-                
+
                 <div class="carousel-indicators" id="leaderIndicators">
                     {% for candidate in leader %}
                     <span class="indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></span>

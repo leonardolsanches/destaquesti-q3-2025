@@ -56,7 +56,7 @@
                         <div class="badge-top {% if loop.index <= 3 %}bg-warning{% else %}bg-info{% endif %}">
                             #{{ loop.index }}
                         </div>
-                        <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                        <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}"
                              class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
                         <div class="card-body text-center">
                             <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
@@ -93,7 +93,7 @@
                         <tr {% if loop.index <= 5 %}class="table-success"{% endif %}>
                             <td><strong>{{ loop.index }}º</strong></td>
                             <td>
-                                <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                                <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}"
                                      class="candidate-thumb" alt="{{ candidate.nome }}">
                             </td>
                             <td>{{ candidate.nome }}</td>

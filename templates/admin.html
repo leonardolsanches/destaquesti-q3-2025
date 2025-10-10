@@ -95,7 +95,7 @@
             <a href="/admin/export-candidates" class="btn btn-success w-100 mt-2">📥 Exportar Backup de Candidatos</a>
             <button id="importBackupBtn" class="btn btn-primary w-100 mt-2">📤 Importar Backup de Candidatos</button>
             <input type="file" id="backupFile" accept=".json" style="display: none;">
-            
+
             {% if config.voting_active %}
             <div class="alert alert-success mt-3">
                 <strong>Votação ATIVA</strong><br>
@@ -130,7 +130,7 @@
                         {% for candidate in candidates %}
                         <tr data-id="{{ candidate.id }}">
                             <td>
-                                <img src="{{ url_for('static', filename='uploads/' + candidate.photo) if candidate.photo != 'default_avatar.png' else url_for('static', filename='images/default_avatar.png') }}" 
+                                <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
                                      class="candidate-thumb" alt="{{ candidate.nome }}">
                             </td>
                             <td class="candidate-nome">{{ candidate.nome }}</td>

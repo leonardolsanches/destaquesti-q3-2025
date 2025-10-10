@@ -393,6 +393,11 @@ document.getElementById('uploadPhotoBtn').addEventListener('click', async () => 
 
         if (data.success) {
             alert('Foto enviada com sucesso!');
+            // Atualizar a imagem no card sem recarregar a página
+            const imgElement = document.querySelector(`img[data-candidate-id="${currentPhotoId}"]`);
+            if (imgElement && data.photo_data) {
+                imgElement.src = data.photo_data;
+            }
             location.reload();
         } else {
             alert(`Erro: ${data.error}`);
