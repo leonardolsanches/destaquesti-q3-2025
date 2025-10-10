@@ -120,8 +120,8 @@
                         <tr>
                             <th>Foto</th>
                             <th>Nome</th>
-                            <th>Justificativa</th>
                             <th>Gestor</th>
+                            <th>Justificativa</th>
                             <th>Categoria</th>
                             <th>Ações</th>
                         </tr>
@@ -134,8 +134,8 @@
                                      class="candidate-thumb" alt="{{ candidate.nome }}">
                             </td>
                             <td class="candidate-nome">{{ candidate.nome }}</td>
-                            <td class="candidate-justificativa">{{ candidate.justificativa[:50] }}{% if candidate.justificativa|length > 50 %}...{% endif %}</td>
                             <td class="candidate-gestor">{{ candidate.gestor }}</td>
+                            <td class="candidate-justificativa">{{ candidate.justificativa[:50] }}{% if candidate.justificativa|length > 50 %}...{% endif %}</td>
                             <td class="candidate-categoria">{{ candidate.categoria }}</td>
                             <td>
                                 <button class="btn btn-sm btn-primary edit-btn" data-id="{{ candidate.id }}">Editar</button>
@@ -232,5 +232,20 @@ function copyUrl() {
     document.execCommand('copy');
     alert('✅ URL copiada para a área de transferência!');
 }
+
+// Script para memorizar login
+document.addEventListener('DOMContentLoaded', (event) => {
+    const emailInput = document.getElementById('loginEmail'); // Assumindo que você tem um input com id 'loginEmail' no seu formulário de login
+    if (emailInput) {
+        const savedEmail = localStorage.getItem('userEmail');
+        if (savedEmail) {
+            emailInput.value = savedEmail;
+        }
+
+        emailInput.addEventListener('change', (e) => {
+            localStorage.setItem('userEmail', e.target.value);
+        });
+    }
+});
 </script>
 {% endblock %}

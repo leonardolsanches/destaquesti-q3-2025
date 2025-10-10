@@ -219,6 +219,14 @@ function navigateCarousel(category, direction) {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
+// Carregar email salvo do localStorage ao carregar a página
+window.addEventListener('DOMContentLoaded', () => {
+    const savedEmail = localStorage.getItem('voterEmail');
+    if (savedEmail) {
+        document.getElementById('voterEmail').value = savedEmail;
+    }
+});
+
 document.getElementById('emailForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -230,6 +238,9 @@ document.getElementById('emailForm').addEventListener('submit', async (e) => {
     }
     
     voterEmail = email;
+    // Salvar email no localStorage
+    localStorage.setItem('voterEmail', email);
+    
     document.getElementById('emailForm').style.display = 'none';
     document.getElementById('votingSection').style.display = 'block';
     
