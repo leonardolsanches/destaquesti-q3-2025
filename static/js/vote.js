@@ -239,23 +239,33 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-const emailForm = document.getElementById('emailForm');
-if (emailForm) {
-    emailForm.addEventListener('submit', async (e) => {
+const validateEmailBtn = document.getElementById('validateEmailBtn');
+if (validateEmailBtn) {
+    validateEmailBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         
         const email = document.getElementById('voterEmail').value.trim().toLowerCase();
+        const emailError = document.getElementById('emailError');
+        
+        if (!email) {
+            emailError.textContent = 'Por favor, insira seu e-mail';
+            emailError.style.display = 'block';
+            return;
+        }
         
         if (!email.endsWith('@claro.com.br')) {
-            alert('Por favor, use um e-mail corporativo @claro.com.br');
+            emailError.textContent = 'Por favor, use um e-mail corporativo @claro.com.br';
+            emailError.style.display = 'block';
             return;
         }
         
         voterEmail = email;
+        emailError.style.display = 'none';
+        
         // Salvar email no localStorage
         localStorage.setItem('voterEmail', email);
         
-        document.getElementById('emailForm').style.display = 'none';
+        document.querySelector('.email-section').style.display = 'none';
         document.getElementById('votingSection').style.display = 'block';
         
         initCarousels();
