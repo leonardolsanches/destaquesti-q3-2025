@@ -84,6 +84,12 @@ function updateCarousel(category) {
         });
     }
     
+    // Update counter
+    const counterElement = document.getElementById(`${category}Counter`);
+    if (counterElement) {
+        counterElement.textContent = `${carousel.currentIndex + 1} / ${carousel.slides.length}`;
+    }
+    
     updateSelectionStates();
 }
 
@@ -128,6 +134,12 @@ function initCarousels() {
         if (!wrapper) return;
         
         carousels[category].slides = Array.from(wrapper.querySelectorAll('.carousel-slide'));
+        
+        // Inicializar contador
+        const counterElement = document.getElementById(`${category}Counter`);
+        if (counterElement && carousels[category].slides.length > 0) {
+            counterElement.textContent = `1 / ${carousels[category].slides.length}`;
+        }
         
         // Navigation buttons
         document.querySelectorAll(`.carousel-prev[data-category="${category}"]`).forEach(btn => {
@@ -227,27 +239,30 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-document.getElementById('emailForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('voterEmail').value.trim().toLowerCase();
-    
-    if (!email.endsWith('@claro.com.br')) {
-        alert('Por favor, use um e-mail corporativo @claro.com.br');
-        return;
-    }
-    
-    voterEmail = email;
-    // Salvar email no localStorage
-    localStorage.setItem('voterEmail', email);
-    
-    document.getElementById('emailForm').style.display = 'none';
-    document.getElementById('votingSection').style.display = 'block';
-    
-    initCarousels();
-    
-    window.scrollTo({ top: document.getElementById('votingSection').offsetTop - 100, behavior: 'smooth' });
-});
+const emailForm = document.getElementById('emailForm');
+if (emailForm) {
+    emailForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('voterEmail').value.trim().toLowerCase();
+        
+        if (!email.endsWith('@claro.com.br')) {
+            alert('Por favor, use um e-mail corporativo @claro.com.br');
+            return;
+        }
+        
+        voterEmail = email;
+        // Salvar email no localStorage
+        localStorage.setItem('voterEmail', email);
+        
+        document.getElementById('emailForm').style.display = 'none';
+        document.getElementById('votingSection').style.display = 'block';
+        
+        initCarousels();
+        
+        window.scrollTo({ top: document.getElementById('votingSection').offsetTop - 100, behavior: 'smooth' });
+    });
+}
 
 document.querySelectorAll('.select-btn').forEach(btn => {
     btn.addEventListener('click', function() {

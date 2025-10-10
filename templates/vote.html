@@ -29,51 +29,19 @@
                     <div id="emailError" class="text-danger mt-2" style="display: none;"></div>
                 </div>
             </div>
-
-            <div id="votingSection" style="display: none;">
-                <button id="submitVotesBtn" class="btn btn-success btn-lg w-100" style="display: none;">
-                    Finalizar Votação
-                </button>
-            </div>
         </div>
 
-        {% if professional %}
-        <div class="category-section mb-5">
-            <h4 class="mb-3 text-center">Categoria: Eu Faço a Diferença - Profissional</h4>
+        <div id="votingSection" style="display: none;">
+            {% if professional %}
+            <div class="category-section mb-5">
+                <h4 class="mb-3 text-center">Categoria: Eu Faço a Diferença - Profissional</h4>
 
-            <!-- Desktop Grid View -->
-            <div class="desktop-grid">
-                <div class="row g-3">
-                    {% for candidate in professional %}
-                    <div class="col-md-6 col-lg-4 col-xl-3">
-                        <div class="card candidate-card shadow-lg h-100" data-id="{{ candidate.id }}" data-category="professional">
-                            <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
-                                 class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
-                            <div class="card-body">
-                                <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
-                                <p class="card-text"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
-                                <p class="card-text"><small><strong>Justificativa:</strong> {{ candidate.justificativa }}</small></p>
-                                <button class="btn btn-outline-claro w-100 select-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}" data-category="professional">
-                                    Selecionar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Mobile Carousel View -->
-            <div class="mobile-carousel">
-                <div class="carousel-container">
-                    <button class="carousel-nav carousel-prev" data-category="professional">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-
-                    <div class="carousel-wrapper" id="professionalCarousel">
+                <!-- Desktop Grid View -->
+                <div class="desktop-grid">
+                    <div class="row g-3">
                         {% for candidate in professional %}
-                        <div class="carousel-slide {% if loop.first %}active{% endif %}" data-id="{{ candidate.id }}" data-category="professional">
-                            <div class="card candidate-card shadow-lg h-100">
+                        <div class="col-md-6 col-lg-4 col-xl-3">
+                            <div class="card candidate-card shadow-lg h-100" data-id="{{ candidate.id }}" data-category="professional">
                                 <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
                                      class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
                                 <div class="card-body">
@@ -88,58 +56,59 @@
                         </div>
                         {% endfor %}
                     </div>
-
-                    <button class="carousel-nav carousel-next" data-category="professional">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
                 </div>
 
-                <div class="carousel-indicators" id="professionalIndicators">
-                    {% for candidate in professional %}
-                    <span class="indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></span>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        {% endif %}
+                <!-- Mobile Carousel View -->
+                <div class="mobile-carousel">
+                    <div class="carousel-counter" id="professionalCounter">1 / {{ professional|length }}</div>
+                    <div class="carousel-container">
+                        <button class="carousel-nav carousel-prev" data-category="professional">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
 
-        {% if leader %}
-        <div class="category-section">
-            <h4 class="mb-3 text-center">Categoria: Eu Faço a Diferença - Líder</h4>
-
-            <!-- Desktop Grid View -->
-            <div class="desktop-grid">
-                <div class="row g-3">
-                    {% for candidate in leader %}
-                    <div class="col-md-6 col-lg-4 col-xl-3">
-                        <div class="card candidate-card shadow-lg h-100" data-id="{{ candidate.id }}" data-category="leader">
-                            <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
-                                 class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
-                            <div class="card-body">
-                                <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
-                                <p class="card-text"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
-                                <p class="card-text"><small><strong>Justificativa:</strong> {{ candidate.justificativa }}</small></p>
-                                <button class="btn btn-outline-claro w-100 select-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}" data-category="leader">
-                                    Selecionar
-                                </button>
+                        <div class="carousel-wrapper" id="professionalCarousel">
+                            {% for candidate in professional %}
+                            <div class="carousel-slide {% if loop.first %}active{% endif %}" data-id="{{ candidate.id }}" data-category="professional">
+                                <div class="card candidate-card shadow-lg h-100">
+                                    <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
+                                         class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
+                                        <p class="card-text"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
+                                        <p class="card-text"><small><strong>Justificativa:</strong> {{ candidate.justificativa }}</small></p>
+                                        <button class="btn btn-outline-claro w-100 select-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}" data-category="professional">
+                                            Selecionar
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
+                            {% endfor %}
                         </div>
+
+                        <button class="carousel-nav carousel-next" data-category="professional">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
-                    {% endfor %}
+
+                    <div class="carousel-indicators" id="professionalIndicators">
+                        {% for candidate in professional %}
+                        <span class="indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></span>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
+            {% endif %}
 
-            <!-- Mobile Carousel View -->
-            <div class="mobile-carousel">
-                <div class="carousel-container">
-                    <button class="carousel-nav carousel-prev" data-category="leader">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
+            {% if leader %}
+            <div class="category-section">
+                <h4 class="mb-3 text-center">Categoria: Eu Faço a Diferença - Líder</h4>
 
-                    <div class="carousel-wrapper" id="leaderCarousel">
+                <!-- Desktop Grid View -->
+                <div class="desktop-grid">
+                    <div class="row g-3">
                         {% for candidate in leader %}
-                        <div class="carousel-slide {% if loop.first %}active{% endif %}" data-id="{{ candidate.id }}" data-category="leader">
-                            <div class="card candidate-card shadow-lg h-100">
+                        <div class="col-md-6 col-lg-4 col-xl-3">
+                            <div class="card candidate-card shadow-lg h-100" data-id="{{ candidate.id }}" data-category="leader">
                                 <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
                                      class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
                                 <div class="card-body">
@@ -154,20 +123,53 @@
                         </div>
                         {% endfor %}
                     </div>
-
-                    <button class="carousel-nav carousel-next" data-category="leader">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
                 </div>
 
-                <div class="carousel-indicators" id="leaderIndicators">
-                    {% for candidate in leader %}
-                    <span class="indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></span>
-                    {% endfor %}
+                <!-- Mobile Carousel View -->
+                <div class="mobile-carousel">
+                    <div class="carousel-counter" id="leaderCounter">1 / {{ leader|length }}</div>
+                    <div class="carousel-container">
+                        <button class="carousel-nav carousel-prev" data-category="leader">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+
+                        <div class="carousel-wrapper" id="leaderCarousel">
+                            {% for candidate in leader %}
+                            <div class="carousel-slide {% if loop.first %}active{% endif %}" data-id="{{ candidate.id }}" data-category="leader">
+                                <div class="card candidate-card shadow-lg h-100">
+                                    <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
+                                         class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
+                                        <p class="card-text"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
+                                        <p class="card-text"><small><strong>Justificativa:</strong> {{ candidate.justificativa }}</small></p>
+                                        <button class="btn btn-outline-claro w-100 select-btn" data-id="{{ candidate.id }}" data-nome="{{ candidate.nome }}" data-category="leader">
+                                            Selecionar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <button class="carousel-nav carousel-next" data-category="leader">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="carousel-indicators" id="leaderIndicators">
+                        {% for candidate in leader %}
+                        <span class="indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></span>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
+            {% endif %}
+
+            <button id="submitVotesBtn" class="btn btn-success btn-lg w-100 mt-4" style="display: none;">
+                Finalizar Votação
+            </button>
         </div>
-        {% endif %}
     </div>
 </div>
 
