@@ -46,10 +46,15 @@ def process_image(image_file):
     filename = secure_filename(f"{datetime.now().strftime('%Y%m%d%H%M%S')}.png")
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     
+    # Garantir que o diretório existe
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    
     if img.mode == 'RGBA':
-        img.save(filepath, 'PNG')
+        img.save(filepath, 'PNG', optimize=True)
     else:
-        img.save(filepath, 'PNG')
+        img.save(filepath, 'PNG', optimize=True)
+    
+    print(f"Imagem salva em: {filepath}")  # Log para debug
     
     return filename
 
