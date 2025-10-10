@@ -1,4 +1,36 @@
-       </div>
+
+{% extends "base.html" %}
+
+{% block title %}Votação - Destaques Q3/2025{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <h1 class="display-4 text-claro mb-3">Vote nos Destaques Q3/2025</h1>
+        <p class="lead">Escolha o melhor profissional e líder do trimestre</p>
+        <div class="alert alert-info">
+            <strong>Tempo restante:</strong> <span id="countdown"></span>
+        </div>
+    </div>
+
+    <div class="voting-container">
+        <div class="email-section mb-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="mb-3">Insira seu e-mail Claro para votar</h5>
+                    <div class="input-group">
+                        <input type="email" class="form-control" id="voterEmail" placeholder="seu.nome@claro.com.br">
+                        <button class="btn btn-claro" id="validateEmailBtn">Validar E-mail</button>
+                    </div>
+                    <div id="emailError" class="text-danger mt-2" style="display: none;"></div>
+                </div>
+            </div>
+
+            <div id="votingSection" style="display: none;">
                 <button id="submitVotesBtn" class="btn btn-success btn-lg w-100" style="display: none;">
                     Finalizar Votação
                 </button>
