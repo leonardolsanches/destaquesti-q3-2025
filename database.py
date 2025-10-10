@@ -31,7 +31,7 @@ def init_database():
             gestor TEXT,
             periodo TEXT,
             categoria TEXT,
-            photo VARCHAR(255) DEFAULT 'default_avatar.png',
+            photo TEXT DEFAULT 'default_avatar.png',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -50,7 +50,7 @@ def init_database():
     cur.execute('''
         CREATE TABLE IF NOT EXISTS voters (
             id SERIAL PRIMARY KEY,
-            email VARCHAR(255) UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
             professional_id INTEGER REFERENCES candidates(id) ON DELETE SET NULL,
             leader_id INTEGER REFERENCES candidates(id) ON DELETE SET NULL,
             voted_professional BOOLEAN DEFAULT FALSE,
