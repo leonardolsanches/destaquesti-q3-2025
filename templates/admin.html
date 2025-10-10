@@ -120,8 +120,8 @@
                         <tr>
                             <th>Foto</th>
                             <th>Nome</th>
-                            <th>Gestor</th>
                             <th>Justificativa</th>
+                            <th>Gestor</th>
                             <th>Categoria</th>
                             <th>Ações</th>
                         </tr>
@@ -134,8 +134,8 @@
                                      class="candidate-thumb" alt="{{ candidate.nome }}">
                             </td>
                             <td class="candidate-nome">{{ candidate.nome }}</td>
-                            <td class="candidate-gestor">{{ candidate.gestor }}</td>
                             <td class="candidate-justificativa">{{ candidate.justificativa[:50] }}{% if candidate.justificativa|length > 50 %}...{% endif %}</td>
+                            <td class="candidate-gestor">{{ candidate.gestor }}</td>
                             <td class="candidate-categoria">{{ candidate.categoria }}</td>
                             <td>
                                 <button class="btn btn-sm btn-primary edit-btn" data-id="{{ candidate.id }}">Editar</button>
