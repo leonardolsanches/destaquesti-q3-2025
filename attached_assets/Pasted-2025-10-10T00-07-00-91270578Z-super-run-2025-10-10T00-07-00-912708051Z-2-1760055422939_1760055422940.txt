@@ -1,0 +1,109 @@
+2025-10-10T00:07:00.91270578Z     super().run()
+2025-10-10T00:07:00.912708051Z     ~~~~~~~~~~~^^
+2025-10-10T00:07:00.912710331Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/app/base.py", line 71, in run
+2025-10-10T00:07:00.912712581Z     Arbiter(self).run()
+2025-10-10T00:07:00.912715071Z     ~~~~~~~^^^^^^
+2025-10-10T00:07:00.912717821Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/arbiter.py", line 57, in __init__
+2025-10-10T00:07:00.912720471Z     self.setup(app)
+2025-10-10T00:07:00.912722951Z     ~~~~~~~~~~^^^^^
+2025-10-10T00:07:00.912725971Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/arbiter.py", line 117, in setup
+2025-10-10T00:07:00.912728191Z     self.app.wsgi()
+2025-10-10T00:07:00.912730691Z     ~~~~~~~~~~~~~^^
+2025-10-10T00:07:00.912733381Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-10-10T00:07:00.912736091Z     self.callable = self.load()
+2025-10-10T00:07:00.912738211Z                     ~~~~~~~~~^^
+2025-10-10T00:07:00.912740432Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-10-10T00:07:00.912742641Z     return self.load_wsgiapp()
+2025-10-10T00:07:00.912744881Z            ~~~~~~~~~~~~~~~~~^^
+2025-10-10T00:07:00.912747622Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-10-10T00:07:00.912750492Z     return util.import_app(self.app_uri)
+2025-10-10T00:07:00.912752982Z            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+2025-10-10T00:07:00.912755422Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+2025-10-10T00:07:00.912757842Z     mod = importlib.import_module(module)
+2025-10-10T00:07:00.912760182Z   File "/opt/render/project/python/Python-3.13.4/lib/python3.13/importlib/__init__.py", line 88, in import_module
+2025-10-10T00:07:00.912763022Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-10-10T00:07:00.912765102Z            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-10-10T00:07:00.912767362Z   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2025-10-10T00:07:00.912769612Z   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2025-10-10T00:07:00.912772352Z   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+2025-10-10T00:07:00.912774532Z   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+2025-10-10T00:07:00.912776753Z   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+2025-10-10T00:07:00.912797273Z   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2025-10-10T00:07:00.912799993Z   File "/opt/render/project/src/app.py", line 19, in <module>
+2025-10-10T00:07:00.912802543Z     dm = DataManager()
+2025-10-10T00:07:00.912820214Z   File "/opt/render/project/src/data_manager.py", line 10, in __init__
+2025-10-10T00:07:00.912822804Z     init_database()
+2025-10-10T00:07:00.912825074Z     ~~~~~~~~~~~~~^^
+2025-10-10T00:07:00.912827404Z   File "/opt/render/project/src/database.py", line 22, in init_database
+2025-10-10T00:07:00.912830124Z     conn = get_db_connection()
+2025-10-10T00:07:00.912832424Z   File "/opt/render/project/src/database.py", line 18, in get_db_connection
+2025-10-10T00:07:00.912834744Z     return psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+2025-10-10T00:07:00.912836944Z            ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-10-10T00:07:00.912839234Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/psycopg2/__init__.py", line 121, in connect
+2025-10-10T00:07:00.912841344Z     dsn = _ext.make_dsn(dsn, **kwargs)
+2025-10-10T00:07:00.912843784Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/psycopg2/extensions.py", line 145, in make_dsn
+2025-10-10T00:07:00.912846124Z     parse_dsn(dsn)
+2025-10-10T00:07:00.912848395Z     ~~~~~~~~~^^^^^
+2025-10-10T00:07:00.912863745Z psycopg2.ProgrammingError: invalid dsn: invalid connection option "postgresql://neondb_owner:npg_rsFqPaj5Y2iz@ep-restless-term-adskb2wg.c-2.us-east-1.aws.neon.tech/neondb?sslmode"
+2025-10-10T00:07:00.912866145Z 
+2025-10-10T00:07:02.651163461Z ==> Exited with status 1
+2025-10-10T00:07:02.667140769Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+2025-10-10T00:07:07.077815267Z ==> Running 'gunicorn --bind=0.0.0.0:5000 --reuse-port app:app'
+2025-10-10T00:07:10.87823411Z Erro ao inicializar banco: invalid dsn: invalid connection option "postgresql://neondb_owner:npg_rsFqPaj5Y2iz@ep-restless-term-adskb2wg.c-2.us-east-1.aws.neon.tech/neondb?sslmode"
+2025-10-10T00:07:10.878274991Z 
+2025-10-10T00:07:10.879639118Z Traceback (most recent call last):
+2025-10-10T00:07:10.881039287Z   File "/opt/render/project/src/.venv/bin/gunicorn", line 8, in <module>
+2025-10-10T00:07:10.881050217Z     sys.exit(run())
+2025-10-10T00:07:10.881053328Z              ~~~^^
+2025-10-10T00:07:10.881056928Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 66, in run
+2025-10-10T00:07:10.881059808Z     WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]", prog=prog).run()
+2025-10-10T00:07:10.881062588Z     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+2025-10-10T00:07:10.881065198Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/app/base.py", line 235, in run
+2025-10-10T00:07:10.881068028Z     super().run()
+2025-10-10T00:07:10.881070758Z     ~~~~~~~~~~~^^
+2025-10-10T00:07:10.881073248Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/app/base.py", line 71, in run
+2025-10-10T00:07:10.881075908Z     Arbiter(self).run()
+2025-10-10T00:07:10.881078398Z     ~~~~~~~^^^^^^
+2025-10-10T00:07:10.881081008Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/arbiter.py", line 57, in __init__
+2025-10-10T00:07:10.881084168Z     self.setup(app)
+2025-10-10T00:07:10.881086988Z     ~~~~~~~~~~^^^^^
+2025-10-10T00:07:10.881089738Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/arbiter.py", line 117, in setup
+2025-10-10T00:07:10.881092449Z     self.app.wsgi()
+2025-10-10T00:07:10.881094778Z     ~~~~~~~~~~~~~^^
+2025-10-10T00:07:10.881097019Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-10-10T00:07:10.881099999Z     self.callable = self.load()
+2025-10-10T00:07:10.881102449Z                     ~~~~~~~~~^^
+2025-10-10T00:07:10.881104859Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-10-10T00:07:10.881107139Z     return self.load_wsgiapp()
+2025-10-10T00:07:10.881109409Z            ~~~~~~~~~~~~~~~~~^^
+2025-10-10T00:07:10.881112869Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-10-10T00:07:10.881115949Z     return util.import_app(self.app_uri)
+2025-10-10T00:07:10.881119069Z            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+2025-10-10T00:07:10.881121739Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+2025-10-10T00:07:10.881124369Z     mod = importlib.import_module(module)
+2025-10-10T00:07:10.881126799Z   File "/opt/render/project/python/Python-3.13.4/lib/python3.13/importlib/__init__.py", line 88, in import_module
+2025-10-10T00:07:10.881129719Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-10-10T00:07:10.88113237Z            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-10-10T00:07:10.88113486Z   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2025-10-10T00:07:10.88113751Z   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2025-10-10T00:07:10.88114028Z   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+2025-10-10T00:07:10.88114829Z   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+2025-10-10T00:07:10.88115106Z   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+2025-10-10T00:07:10.88116782Z   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2025-10-10T00:07:10.881170911Z   File "/opt/render/project/src/app.py", line 19, in <module>
+2025-10-10T00:07:10.881173411Z     dm = DataManager()
+2025-10-10T00:07:10.881175951Z   File "/opt/render/project/src/data_manager.py", line 10, in __init__
+2025-10-10T00:07:10.881178761Z     init_database()
+2025-10-10T00:07:10.881181371Z     ~~~~~~~~~~~~~^^
+2025-10-10T00:07:10.881184321Z   File "/opt/render/project/src/database.py", line 22, in init_database
+2025-10-10T00:07:10.881187011Z     conn = get_db_connection()
+2025-10-10T00:07:10.881189611Z   File "/opt/render/project/src/database.py", line 18, in get_db_connection
+2025-10-10T00:07:10.881192251Z     return psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+2025-10-10T00:07:10.881194891Z            ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-10-10T00:07:10.881197711Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/psycopg2/__init__.py", line 121, in connect
+2025-10-10T00:07:10.881200492Z     dsn = _ext.make_dsn(dsn, **kwargs)
+2025-10-10T00:07:10.881203381Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/psycopg2/extensions.py", line 145, in make_dsn
+2025-10-10T00:07:10.881206032Z     parse_dsn(dsn)
+2025-10-10T00:07:10.881209062Z     ~~~~~~~~~^^^^^
+2025-10-10T00:07:10.881212362Z psycopg2.ProgrammingError: invalid dsn: invalid connection option "postgresql://neondb_owner:npg_rsFqPaj5Y2iz@ep-restless-term-adskb2wg.c-2.us-east-1.aws.neon.tech/neondb?sslmode"
+2025-10-10T00:07:10.881214932Z 

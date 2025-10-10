@@ -26,9 +26,9 @@ def init_database():
     cur.execute('''
         CREATE TABLE IF NOT EXISTS candidates (
             id SERIAL PRIMARY KEY,
-            nome VARCHAR(255) NOT NULL,
+            nome TEXT NOT NULL,
             justificativa TEXT,
-            gestor VARCHAR(255),
+            gestor TEXT,
             periodo VARCHAR(50),
             categoria VARCHAR(100),
             photo VARCHAR(255) DEFAULT 'default_avatar.png',
