@@ -53,12 +53,12 @@
                             <input type="text" class="form-control" id="addNome" required>
                         </div>
                         <div class="mb-3">
-                            <label for="addJustificativa" class="form-label">Justificativa</label>
-                            <textarea class="form-control" id="addJustificativa" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
                             <label for="addGestor" class="form-label">Gestor</label>
                             <input type="text" class="form-control" id="addGestor" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addJustificativa" class="form-label">Justificativa</label>
+                            <textarea class="form-control" id="addJustificativa" rows="6" required></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="addCategoria" class="form-label">Categoria</label>
@@ -120,8 +120,8 @@
                         <tr>
                             <th>Foto</th>
                             <th>Nome</th>
-                            <th>Justificativa</th>
                             <th>Gestor</th>
+                            <th>Justificativa</th>
                             <th>Categoria</th>
                             <th>Ações</th>
                         </tr>
@@ -134,8 +134,8 @@
                                      class="candidate-thumb" alt="{{ candidate.nome }}">
                             </td>
                             <td class="candidate-nome">{{ candidate.nome }}</td>
-                            <td class="candidate-justificativa">{{ candidate.justificativa[:50] }}{% if candidate.justificativa|length > 50 %}...{% endif %}</td>
                             <td class="candidate-gestor">{{ candidate.gestor }}</td>
+                            <td class="candidate-justificativa">{{ candidate.justificativa[:50] }}{% if candidate.justificativa|length > 50 %}...{% endif %}</td>
                             <td class="candidate-categoria">{{ candidate.categoria }}</td>
                             <td>
                                 <button class="btn btn-sm btn-primary edit-btn" data-id="{{ candidate.id }}">Editar</button>
@@ -166,12 +166,12 @@
                         <input type="text" class="form-control" id="editNome" required>
                     </div>
                     <div class="mb-3">
-                        <label for="editJustificativa" class="form-label">Justificativa</label>
-                        <textarea class="form-control" id="editJustificativa" rows="4" required></textarea>
-                    </div>
-                    <div class="mb-3">
                         <label for="editGestor" class="form-label">Gestor</label>
                         <input type="text" class="form-control" id="editGestor" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editJustificativa" class="form-label">Justificativa</label>
+                        <textarea class="form-control" id="editJustificativa" rows="8" required></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="editCategoria" class="form-label">Categoria</label>

@@ -40,8 +40,8 @@ document.getElementById('addCandidateForm').addEventListener('submit', async (e)
 
     const candidateData = {
         nome: document.getElementById('addNome').value,
-        justificativa: document.getElementById('addJustificativa').value,
         gestor: document.getElementById('addGestor').value,
+        justificativa: document.getElementById('addJustificativa').value,
         categoria: document.getElementById('addCategoria').value
     };
 
@@ -204,19 +204,20 @@ document.querySelectorAll('.edit-btn').forEach(btn => {
 
         document.getElementById('editId').value = id;
         document.getElementById('editNome').value = row.querySelector('.candidate-nome').textContent;
-        document.getElementById('editGestor').value = row.querySelector('.candidate-gestor').textContent;
         document.getElementById('editCategoria').value = row.querySelector('.candidate-categoria').textContent;
 
-        // Buscar a justificativa completa do servidor
+        // Buscar dados completos do servidor
         try {
             const response = await fetch('/api/candidate/' + id);
             const candidate = await response.json();
             if (candidate) {
                 document.getElementById('editJustificativa').value = candidate.justificativa || '';
+                document.getElementById('editGestor').value = candidate.gestor || '';
             }
         } catch (error) {
-            console.error('Erro ao carregar justificativa:', error);
+            console.error('Erro ao carregar dados do candidato:', error);
             document.getElementById('editJustificativa').value = '';
+            document.getElementById('editGestor').value = '';
         }
 
         new bootstrap.Modal(document.getElementById('editModal')).show();

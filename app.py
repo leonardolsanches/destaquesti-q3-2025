@@ -111,15 +111,15 @@ def upload_excel():
                     continue
                 
                 colaborador = row[0]
-                justificativa = row[1] if len(row) > 1 else ''
-                gestor = row[2] if len(row) > 2 else ''
+                gestor = row[1] if len(row) > 1 else ''
+                justificativa = row[2] if len(row) > 2 else ''
                 periodo = row[3] if len(row) > 3 else 'Q3/2025'
                 categoria = row[4] if len(row) > 4 else 'Eu Faço a Diferença'
                 
                 candidate = {
                     'nome': str(colaborador).strip(),
-                    'justificativa': str(justificativa).strip() if justificativa else '',
                     'gestor': str(gestor).strip() if gestor else '',
+                    'justificativa': str(justificativa).strip() if justificativa else '',
                     'periodo': str(periodo).strip() if periodo else 'Q3/2025',
                     'categoria': str(categoria).strip() if categoria else 'Eu Faço a Diferença',
                     'photo': 'default_avatar.png'

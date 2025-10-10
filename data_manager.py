@@ -66,6 +66,12 @@ class DataManager:
         added_count = 0
         for new_candidate in new_candidates:
             if new_candidate['nome'].lower().strip() not in existing_names:
+                # Garantir que photo seja incluído (preservar base64 do backup)
+                if 'photo' not in new_candidate or not new_candidate['photo']:
+                    new_candidate['photo'] = 'default_avatar.png'
+                elif not new_candidate['photo'].startswith('data:image') and new_candidate['photo'] != 'default_avatar.png':
+                    # Se não é base64 nem default, usar default
+                    new_candidate['photo'] = 'default_avatar.png'
                 self.add_candidate(new_candidate)
                 added_count += 1
         
