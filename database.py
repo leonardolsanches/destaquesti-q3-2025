@@ -29,8 +29,8 @@ def init_database():
             nome TEXT NOT NULL,
             justificativa TEXT,
             gestor TEXT,
-            periodo VARCHAR(50),
-            categoria VARCHAR(100),
+            periodo TEXT,
+            categoria TEXT,
             photo VARCHAR(255) DEFAULT 'default_avatar.png',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
