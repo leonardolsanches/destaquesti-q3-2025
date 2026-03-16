@@ -19,6 +19,14 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 dm = DataManager()
 
+@app.context_processor
+def inject_period():
+    try:
+        config = dm.get_config()
+        return {'app_period': config.get('period', 'Destaques')}
+    except Exception:
+        return {'app_period': 'Destaques'}
+
 # Credenciais de admin
 ADMIN_USERNAME = 'leonardo'
 ADMIN_PASSWORD = 'thaiane'
@@ -245,6 +253,21 @@ def set_voting_config():
         
         return jsonify({'success': True})
     
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/set-period', methods=['POST'])
+@require_admin_auth
+def set_period():
+    try:
+        data = request.get_json()
+        period = data.get('period', '').strip()
+        if not period:
+            return jsonify({'success': False, 'error': 'Período não pode estar vazio'})
+        config = dm.get_config()
+        config['period'] = period
+        dm.save_config(config)
+        return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Resultados - Votação Q3/2025{% endblock %}
+{% block title %}Resultados da Votação{% if app_period %} {{ app_period }}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
     <div class="text-center mb-4">
         <h1 class="display-4 text-claro mb-3">Resultados da Votação</h1>
-        <h3 class="text-muted">Destaques Q3/2025</h3>
+        {% if app_period %}<h3 class="text-muted">Destaques {{ app_period }}</h3>{% endif %}
 
         {% if is_active %}
         <div class="alert alert-warning mt-3">
@@ -46,7 +46,7 @@
     {% if total_votes > 0 %}
     <div class="card shadow mb-4">
         <div class="card-header bg-claro text-white">
-            <h5 class="mb-0">🏆 TOP 5 - Destaques Q3/2025</h5>
+            <h5 class="mb-0">🏆 TOP 5{% if app_period %} - Destaques {{ app_period }}{% endif %}</h5>
         </div>
         <div class="card-body">
             <div class="row">

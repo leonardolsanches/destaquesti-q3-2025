@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Administração - Votação Q3/2025{% endblock %}
+{% block title %}Administração - Votação{% if app_period %} {{ app_period }}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
@@ -80,6 +80,15 @@
             <h5 class="mb-0">Controle de Votação</h5>
         </div>
         <div class="card-body">
+            <div class="mb-3">
+                <label for="periodInput" class="form-label fw-bold">Identificação do Período (ex: Q3/2025, Q4/2025)</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="periodInput" value="{{ config.period or app_period }}" placeholder="Ex: Q3/2025">
+                    <button class="btn btn-outline-secondary" type="button" id="savePeriodBtn">Salvar Período</button>
+                </div>
+                <small class="text-muted">Este nome aparece em todas as páginas do sistema.</small>
+            </div>
+            <hr>
             <form id="votingConfigForm">
                 <div class="mb-3">
                     <label for="endDate" class="form-label">Data e Hora de Encerramento</label>

@@ -148,10 +148,38 @@ document.getElementById('resetVotingBtn').addEventListener('click', async () => 
     }
 });
 
+const savePeriodBtn = document.getElementById('savePeriodBtn');
+if (savePeriodBtn) {
+    savePeriodBtn.addEventListener('click', async () => {
+        const period = document.getElementById('periodInput').value.trim();
+        if (!period) {
+            alert('Por favor, informe o período.');
+            return;
+        }
+        try {
+            const response = await fetch('/admin/set-period', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ period })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert(`✓ Período atualizado para "${period}" em todas as páginas!`);
+                location.reload();
+            } else {
+                alert(`Erro: ${data.error}`);
+            }
+        } catch (error) {
+            alert(`Erro: ${error.message}`);
+        }
+    });
+}
+
 const saveHistoryBtn = document.getElementById('saveHistoryBtn');
 if (saveHistoryBtn) {
     saveHistoryBtn.addEventListener('click', async () => {
-        const period = prompt('Digite o período desta votação (ex: Q3/2025):');
+        const currentPeriod = document.getElementById('periodInput') ? document.getElementById('periodInput').value : '';
+        const period = prompt('Digite o período desta votação:', currentPeriod);
         if (!period) return;
 
         try {

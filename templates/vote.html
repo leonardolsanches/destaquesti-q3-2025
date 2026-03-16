@@ -1,7 +1,7 @@
 
 {% extends "base.html" %}
 
-{% block title %}Votação - Destaques Q3/2025{% endblock %}
+{% block title %}Votação - Destaques{% if app_period %} {{ app_period }}{% endif %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -10,7 +10,7 @@
 {% block content %}
 <div class="container my-5">
     <div class="text-center mb-4">
-        <h1 class="display-4 text-claro mb-3">Vote nos Destaques Q3/2025</h1>
+        <h1 class="display-4 text-claro mb-3">Vote nos Destaques{% if app_period %} {{ app_period }}{% endif %}</h1>
         <p class="lead">Escolha o melhor profissional e líder do trimestre</p>
         <div class="alert alert-info">
             <strong>Tempo restante:</strong> <span id="countdown"></span>

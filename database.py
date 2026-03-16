@@ -95,11 +95,24 @@ def init_database():
         )
     ''')
     
+    # Migração: adicionar coluna period se não existir
+    try:
+        cur.execute("ALTER TABLE config ADD COLUMN IF NOT EXISTS period TEXT DEFAULT ''")
+        print("✅ Coluna period adicionada/verificada na tabela config")
+    except Exception:
+        conn.rollback()
+
     # Inserir configuração padrão se não existir
     cur.execute('''
-        INSERT INTO config (id, voting_active) 
-        VALUES (1, FALSE) 
+        INSERT INTO config (id, voting_active, period) 
+        VALUES (1, FALSE, '') 
         ON CONFLICT (id) DO NOTHING
+    ''')
+
+    # Limpar valores de período fixos deixados por versões anteriores
+    cur.execute('''
+        UPDATE config SET period = ''
+        WHERE id = 1 AND period IN ('Q3/2025', 'Destaques')
     ''')
     
     # Tabela de histórico

@@ -1,7 +1,10 @@
 
 import json
+import os
 from datetime import datetime
 from database import get_db_connection, init_database
+
+DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 
 class DataManager:
     def __init__(self):
@@ -118,6 +121,7 @@ class DataManager:
         conn.commit()
         cur.close()
         conn.close()
+        self._save_local_backup_votes()
 
     def remove_vote(self, candidate_id):
         conn = get_db_connection()
@@ -202,6 +206,7 @@ class DataManager:
         conn.commit()
         cur.close()
         conn.close()
+        self._save_local_backup_voters()
         return True
 
     def has_voted(self, email, candidate_id):
@@ -249,13 +254,50 @@ class DataManager:
             UPDATE config SET 
                 voting_end_date = %s,
                 voting_active = %s,
+                period = %s,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = 1
-        ''', (config.get('voting_end_date'), config.get('voting_active')))
+        ''', (config.get('voting_end_date'), config.get('voting_active'), config.get('period', 'Destaques')))
         
         conn.commit()
         cur.close()
         conn.close()
+        self._save_local_backup_config(config)
+
+    def _save_local_backup_config(self, config):
+        try:
+            os.makedirs(DATA_DIR, exist_ok=True)
+            path = os.path.join(DATA_DIR, 'config.json')
+            safe_config = {k: v for k, v in config.items() if k != 'id'}
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(safe_config, f, ensure_ascii=False, default=str)
+        except Exception as e:
+            print(f"Aviso: não foi possível salvar backup local de config: {e}")
+
+    def _save_local_backup_votes(self):
+        try:
+            os.makedirs(DATA_DIR, exist_ok=True)
+            votes = self.get_votes()
+            path = os.path.join(DATA_DIR, 'votes.json')
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(votes, f, ensure_ascii=False)
+        except Exception as e:
+            print(f"Aviso: não foi possível salvar backup local de votes: {e}")
+
+    def _save_local_backup_voters(self):
+        try:
+            os.makedirs(DATA_DIR, exist_ok=True)
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('SELECT email, professional_id, leader_id, voted_professional, voted_leader FROM voters')
+            voters = [dict(row) for row in cur.fetchall()]
+            cur.close()
+            conn.close()
+            path = os.path.join(DATA_DIR, 'voters.json')
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(voters, f, ensure_ascii=False, default=str)
+        except Exception as e:
+            print(f"Aviso: não foi possível salvar backup local de voters: {e}")
 
     def is_voting_active(self):
         config = self.get_config()
@@ -342,6 +384,8 @@ class DataManager:
         conn.commit()
         cur.close()
         conn.close()
+        self._save_local_backup_votes()
+        self._save_local_backup_voters()
 
     def delete_all_candidates(self):
         conn = get_db_connection()
