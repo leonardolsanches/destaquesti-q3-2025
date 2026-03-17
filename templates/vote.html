@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}Votação - Destaques{% if app_period %} {{ app_period }}{% endif %}{% endblock %}
@@ -8,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
+<div class="container-xxl my-5">
     <div class="text-center mb-4">
         <h1 class="display-4 text-claro mb-3">Vote nos Destaques{% if app_period %} {{ app_period }}{% endif %}</h1>
         <p class="lead">Escolha o melhor profissional e líder do trimestre</p>
@@ -18,19 +17,34 @@
     </div>
 
     <div class="voting-container">
+
+        <!-- Email validation section -->
         <div class="email-section mb-4">
             <div class="card shadow">
                 <div class="card-body">
                     <h5 class="mb-3">Insira seu e-mail Claro para votar</h5>
                     <div class="input-group">
                         <input type="email" class="form-control" id="voterEmail" placeholder="seu.nome@claro.com.br">
-                        <button class="btn btn-claro" id="validateEmailBtn">Validar E-mail</button>
+                        <button class="btn btn-claro" id="validateEmailBtn">
+                            <span id="validateBtnText">Validar E-mail</span>
+                            <span id="validateBtnSpinner" class="spinner-border spinner-border-sm ms-1" style="display:none;"></span>
+                        </button>
                     </div>
                     <div id="emailError" class="text-danger mt-2" style="display: none;"></div>
                 </div>
             </div>
         </div>
 
+        <!-- Already voted message -->
+        <div id="alreadyVotedSection" style="display: none;">
+            <div class="alert alert-success text-center py-4">
+                <h4 class="mb-2">&#10003; Seu voto já foi registrado!</h4>
+                <p class="mb-3">Você já participou desta votação. Cada e-mail corporativo pode votar apenas uma vez por categoria.</p>
+                <a href="/results" class="btn btn-claro">Ver Resultados</a>
+            </div>
+        </div>
+
+        <!-- Main voting section -->
         <div id="votingSection" style="display: none;">
 
             <!-- Selection Summary Bar -->
@@ -54,24 +68,26 @@
             <div class="category-section mb-5">
                 <h4 class="mb-3 text-center">Categoria: Eu Faço a Diferença - Profissional</h4>
 
-                <!-- Desktop Grid View -->
+                <!-- Desktop Grid -->
                 <div class="desktop-grid">
                     <div class="row g-3">
                         {% for candidate in professional %}
                         <div class="col-md-6 col-lg-4 col-xl-3">
                             <div class="vote-card-wrapper d-flex flex-column h-100">
                                 <div class="card candidate-card shadow-lg flex-grow-1" data-id="{{ candidate.id }}" data-category="professional">
-                                    <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
-                                         class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                                    <div class="candidate-photo-wrap">
+                                        <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}"
+                                             class="candidate-photo" alt="{{ candidate.nome }}">
+                                    </div>
                                     <div class="card-body vote-card-body">
                                         <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
-                                        <p class="card-text"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
-                                        <p class="card-text"><small><strong>Justificativa:</strong> {{ candidate.justificativa }}</small></p>
+                                        <p class="card-text mb-1"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
+                                        <p class="card-text"><small>{{ candidate.justificativa }}</small></p>
                                     </div>
                                 </div>
-                                <button class="btn btn-outline-claro w-100 select-btn mt-2" 
-                                        data-id="{{ candidate.id }}" 
-                                        data-nome="{{ candidate.nome }}" 
+                                <button class="btn btn-outline-claro w-100 select-btn mt-2"
+                                        data-id="{{ candidate.id }}"
+                                        data-nome="{{ candidate.nome }}"
                                         data-category="professional">
                                     Selecionar
                                 </button>
@@ -81,30 +97,31 @@
                     </div>
                 </div>
 
-                <!-- Mobile Carousel View -->
+                <!-- Mobile Carousel -->
                 <div class="mobile-carousel">
                     <div class="carousel-counter" id="professionalCounter">1 / {{ professional|length }}</div>
                     <div class="carousel-container">
                         <button class="carousel-nav carousel-prev" data-category="professional">
                             <i class="fas fa-chevron-left"></i>
                         </button>
-
                         <div class="carousel-wrapper" id="professionalCarousel">
                             {% for candidate in professional %}
                             <div class="carousel-slide {% if loop.first %}active{% endif %}" data-id="{{ candidate.id }}" data-category="professional">
                                 <div class="slide-inner d-flex flex-column">
                                     <div class="card candidate-card shadow-lg flex-grow-1" data-id="{{ candidate.id }}" data-category="professional">
-                                        <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
-                                             class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                                        <div class="candidate-photo-wrap">
+                                            <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}"
+                                                 class="candidate-photo" alt="{{ candidate.nome }}">
+                                        </div>
                                         <div class="card-body vote-card-body">
                                             <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
-                                            <p class="card-text"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
-                                            <p class="card-text"><small><strong>Justificativa:</strong> {{ candidate.justificativa }}</small></p>
+                                            <p class="card-text mb-1"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
+                                            <p class="card-text"><small>{{ candidate.justificativa }}</small></p>
                                         </div>
                                     </div>
-                                    <button class="btn btn-outline-claro w-100 select-btn mt-2 slide-select-btn" 
-                                            data-id="{{ candidate.id }}" 
-                                            data-nome="{{ candidate.nome }}" 
+                                    <button class="btn btn-outline-claro w-100 select-btn slide-select-btn mt-2"
+                                            data-id="{{ candidate.id }}"
+                                            data-nome="{{ candidate.nome }}"
                                             data-category="professional">
                                         Selecionar
                                     </button>
@@ -112,12 +129,10 @@
                             </div>
                             {% endfor %}
                         </div>
-
                         <button class="carousel-nav carousel-next" data-category="professional">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
-
                     <div class="carousel-indicators" id="professionalIndicators">
                         {% for candidate in professional %}
                         <span class="indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></span>
@@ -128,27 +143,29 @@
             {% endif %}
 
             {% if leader %}
-            <div class="category-section">
+            <div class="category-section mb-5">
                 <h4 class="mb-3 text-center">Categoria: Eu Faço a Diferença - Líder</h4>
 
-                <!-- Desktop Grid View -->
+                <!-- Desktop Grid -->
                 <div class="desktop-grid">
                     <div class="row g-3">
                         {% for candidate in leader %}
                         <div class="col-md-6 col-lg-4 col-xl-3">
                             <div class="vote-card-wrapper d-flex flex-column h-100">
                                 <div class="card candidate-card shadow-lg flex-grow-1" data-id="{{ candidate.id }}" data-category="leader">
-                                    <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
-                                         class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                                    <div class="candidate-photo-wrap">
+                                        <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}"
+                                             class="candidate-photo" alt="{{ candidate.nome }}">
+                                    </div>
                                     <div class="card-body vote-card-body">
                                         <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
-                                        <p class="card-text"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
-                                        <p class="card-text"><small><strong>Justificativa:</strong> {{ candidate.justificativa }}</small></p>
+                                        <p class="card-text mb-1"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
+                                        <p class="card-text"><small>{{ candidate.justificativa }}</small></p>
                                     </div>
                                 </div>
-                                <button class="btn btn-outline-claro w-100 select-btn mt-2" 
-                                        data-id="{{ candidate.id }}" 
-                                        data-nome="{{ candidate.nome }}" 
+                                <button class="btn btn-outline-claro w-100 select-btn mt-2"
+                                        data-id="{{ candidate.id }}"
+                                        data-nome="{{ candidate.nome }}"
                                         data-category="leader">
                                     Selecionar
                                 </button>
@@ -158,30 +175,31 @@
                     </div>
                 </div>
 
-                <!-- Mobile Carousel View -->
+                <!-- Mobile Carousel -->
                 <div class="mobile-carousel">
                     <div class="carousel-counter" id="leaderCounter">1 / {{ leader|length }}</div>
                     <div class="carousel-container">
                         <button class="carousel-nav carousel-prev" data-category="leader">
                             <i class="fas fa-chevron-left"></i>
                         </button>
-
                         <div class="carousel-wrapper" id="leaderCarousel">
                             {% for candidate in leader %}
                             <div class="carousel-slide {% if loop.first %}active{% endif %}" data-id="{{ candidate.id }}" data-category="leader">
                                 <div class="slide-inner d-flex flex-column">
                                     <div class="card candidate-card shadow-lg flex-grow-1" data-id="{{ candidate.id }}" data-category="leader">
-                                        <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}" 
-                                             class="card-img-top candidate-photo" alt="{{ candidate.nome }}">
+                                        <div class="candidate-photo-wrap">
+                                            <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}"
+                                                 class="candidate-photo" alt="{{ candidate.nome }}">
+                                        </div>
                                         <div class="card-body vote-card-body">
                                             <h5 class="card-title text-claro">{{ candidate.nome }}</h5>
-                                            <p class="card-text"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
-                                            <p class="card-text"><small><strong>Justificativa:</strong> {{ candidate.justificativa }}</small></p>
+                                            <p class="card-text mb-1"><strong>Gestor:</strong> {{ candidate.gestor }}</p>
+                                            <p class="card-text"><small>{{ candidate.justificativa }}</small></p>
                                         </div>
                                     </div>
-                                    <button class="btn btn-outline-claro w-100 select-btn mt-2 slide-select-btn" 
-                                            data-id="{{ candidate.id }}" 
-                                            data-nome="{{ candidate.nome }}" 
+                                    <button class="btn btn-outline-claro w-100 select-btn slide-select-btn mt-2"
+                                            data-id="{{ candidate.id }}"
+                                            data-nome="{{ candidate.nome }}"
                                             data-category="leader">
                                         Selecionar
                                     </button>
@@ -189,12 +207,10 @@
                             </div>
                             {% endfor %}
                         </div>
-
                         <button class="carousel-nav carousel-next" data-category="leader">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
-
                     <div class="carousel-indicators" id="leaderIndicators">
                         {% for candidate in leader %}
                         <span class="indicator {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}"></span>
@@ -204,8 +220,11 @@
             </div>
             {% endif %}
 
-            <button id="submitVotesBtn" class="btn btn-success btn-lg w-100 mt-4" style="display: none;">
-                ✅ Confirmar e Finalizar Votação
+            <!-- Warning and submit -->
+            <div id="selectionWarning" class="alert alert-warning text-center" style="display:none;"></div>
+
+            <button id="submitVotesBtn" class="btn btn-success btn-lg w-100 mt-2" style="display: none;">
+                &#10003; Confirmar e Finalizar Votação
             </button>
         </div>
     </div>
@@ -217,7 +236,7 @@
         <div class="modal-content">
             <div class="modal-header bg-claro text-white">
                 <h5 class="modal-title">Confirmar Votação</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" id="modalCloseBtn"></button>
             </div>
             <div class="modal-body">
                 <p class="mb-3">Você confirma seus votos? <strong>Esta ação não pode ser desfeita.</strong></p>
@@ -240,8 +259,11 @@
                 <p class="text-muted mt-3 mb-0"><small>Seus votos são registrados de forma auditável vinculados ao seu e-mail corporativo.</small></p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-claro" id="confirmVoteBtn">Confirmar Votos</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelVoteBtn">Cancelar</button>
+                <button type="button" class="btn btn-claro" id="confirmVoteBtn">
+                    <span id="confirmBtnText">Confirmar Votos</span>
+                    <span id="confirmBtnSpinner" class="spinner-border spinner-border-sm ms-1" style="display:none;"></span>
+                </button>
             </div>
         </div>
     </div>
@@ -249,6 +271,8 @@
 
 <script>
 const endDate = new Date("{{ config.voting_end_date }}").getTime();
+const hasProfessional = {{ (professional|length > 0)|tojson }};
+const hasLeader = {{ (leader|length > 0)|tojson }};
 </script>
 <script src="{{ url_for('static', filename='js/vote.js') }}"></script>
 {% endblock %}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory, session, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory, send_file, session, flash
 import os
 import json
 from datetime import datetime
@@ -406,39 +406,63 @@ def vote():
                          leader=leader, 
                          config=config)
 
+@app.route('/api/check-voter', methods=['POST'])
+def check_voter():
+    try:
+        data = request.get_json()
+        email = data.get('email', '').strip().lower()
+        if not email.endswith('@claro.com.br'):
+            return jsonify({'success': False, 'error': 'E-mail inválido'})
+        voter = dm.get_voter_status(email)
+        if voter:
+            return jsonify({
+                'success': True,
+                'voted_professional': voter.get('voted_professional', False),
+                'voted_leader': voter.get('voted_leader', False),
+                'professional_id': voter.get('professional_id'),
+                'leader_id': voter.get('leader_id')
+            })
+        return jsonify({'success': True, 'voted_professional': False, 'voted_leader': False})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/submit-vote', methods=['POST'])
 def submit_vote():
     try:
         data = request.get_json()
         email = data.get('email', '').strip().lower()
         candidate_id = data.get('candidate_id')
-        
+
         if not email.endswith('@claro.com.br'):
             return jsonify({'success': False, 'error': 'E-mail deve ser do domínio @claro.com.br'})
-        
+
         if not dm.is_voting_active():
             return jsonify({'success': False, 'error': 'Votação encerrada'})
-        
+
         candidates = dm.get_candidates()
         candidate = next((c for c in candidates if c['id'] == candidate_id), None)
-        
+
         if not candidate:
             return jsonify({'success': False, 'error': 'Candidato não encontrado'})
-        
-        categoria = candidate.get('categoria', '')
-        is_leader = 'Líder' in categoria
-        
-        # Verificar se já votou nesta categoria
-        previous_vote_id = dm.has_voted(email, candidate_id)
-        
-        # Adicionar voto ao candidato (add_voter já remove voto anterior se existir)
-        dm.add_vote(candidate_id)
-        
+
+        is_leader = 'Líder' in candidate.get('categoria', '')
+
+        # Verificar se já votou nesta categoria e bloquear re-votação
+        voter = dm.get_voter_status(email)
+        if voter:
+            already_voted = voter.get('voted_leader') if is_leader else voter.get('voted_professional')
+            if already_voted:
+                return jsonify({'success': False, 'error': 'Você já votou nesta categoria. Não é permitido votar novamente.'})
+
+        # Registrar o eleitor primeiro (cria/atualiza registro)
         if not dm.add_voter(email, candidate_id):
             return jsonify({'success': False, 'error': 'Erro ao registrar voto'})
-        
+
+        # Adicionar voto ao candidato
+        dm.add_vote(candidate_id)
+
         return jsonify({'success': True})
-    
+
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
@@ -495,6 +519,88 @@ def voting_history():
 def api_voting_history():
     history = dm.get_voting_history()
     return jsonify({'history': history})
+
+@app.route('/admin/delete-history', methods=['POST'])
+@require_admin_auth
+def delete_history():
+    try:
+        data = request.get_json()
+        entry_id = data.get('id')
+        if not entry_id:
+            return jsonify({'success': False, 'error': 'ID não fornecido'})
+        dm.delete_history_entry(entry_id)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/import-history-excel', methods=['POST'])
+@require_admin_auth
+def import_history_excel():
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'Nenhum arquivo enviado'})
+        file = request.files['file']
+        if not file.filename.endswith('.xlsx'):
+            return jsonify({'success': False, 'error': 'Apenas arquivos .xlsx são suportados'})
+        file_bytes = file.read()
+        inserted = dm.import_history_from_excel(file_bytes)
+        return jsonify({'success': True, 'inserted': inserted, 'message': f'{inserted} período(s) importado(s) com sucesso'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/export-history')
+@require_admin_auth
+def export_history():
+    try:
+        import io
+        history = dm.get_voting_history()
+        json_bytes = json.dumps(history, ensure_ascii=False, indent=2).encode('utf-8')
+        return send_file(
+            io.BytesIO(json_bytes),
+            mimetype='application/json',
+            as_attachment=True,
+            download_name='historico_votacoes.json'
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/admin/import-history-json', methods=['POST'])
+@require_admin_auth
+def import_history_json():
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'Nenhum arquivo enviado'})
+        file = request.files['file']
+        data = json.loads(file.read().decode('utf-8'))
+        if not isinstance(data, list):
+            return jsonify({'success': False, 'error': 'Formato inválido: esperado array JSON'})
+        conn = get_db_connection()
+        cur = conn.cursor()
+        inserted = 0
+        for entry in data:
+            cur.execute('''
+                INSERT INTO voting_history (description, config, candidates, total_voters, total_votes)
+                VALUES (%s, %s, %s, %s, %s)
+            ''', (
+                entry.get('description', ''),
+                json.dumps(entry.get('config', {})),
+                json.dumps(entry.get('candidates', [])),
+                entry.get('total_voters', 0),
+                entry.get('total_votes', 0)
+            ))
+            inserted += 1
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({'success': True, 'inserted': inserted})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/history-report')
+@require_admin_auth
+def history_report():
+    report = dm.get_history_report()
+    return render_template('history_report.html', report=report)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

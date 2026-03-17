@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Relatório Analítico – Histórico{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .stat-card { border-left: 4px solid #8B1538; }
+    .repeat-badge { background-color: #8B1538; color: white; border-radius: 999px; padding: 2px 10px; font-size: 0.82rem; }
+    .period-row:hover { background-color: #fdf0f3; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-xxl my-5">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <h1 class="text-claro mb-0"><i class="fas fa-chart-bar me-2"></i>Relatório Analítico</h1>
+        <a href="{{ url_for('voting_history') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Voltar ao Histórico
+        </a>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-md-3">
+            <div class="card shadow stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="display-5 text-claro fw-bold">{{ report.total_entries }}</div>
+                    <div class="text-muted">Períodos</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="display-5 text-claro fw-bold">{{ report.total_candidates }}</div>
+                    <div class="text-muted">Indicações totais</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="display-5 text-claro fw-bold">{{ report.unique_candidates }}</div>
+                    <div class="text-muted">Colaboradores únicos</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="display-5 text-claro fw-bold">{{ report.repeated | length }}</div>
+                    <div class="text-muted">Recorrentes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Periods timeline -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-claro text-white">
+            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Linha do Tempo por Período</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Período</th>
+                            <th>Descrição</th>
+                            <th class="text-center">Candidatos</th>
+                            <th class="text-center">Votantes</th>
+                            <th class="text-center">Votos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in report.periods %}
+                        <tr class="period-row">
+                            <td><strong>{{ p.period or p.description }}</strong></td>
+                            <td class="text-muted small">{{ p.description }}</td>
+                            <td class="text-center">{{ p.candidate_count }}</td>
+                            <td class="text-center">{{ p.total_voters }}</td>
+                            <td class="text-center">{{ p.total_votes }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5" class="text-center text-muted py-4">Nenhum dado disponível.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category stats -->
+    {% if report.cat_stats %}
+    <div class="card shadow mb-5">
+        <div class="card-header bg-claro text-white">
+            <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Indicações por Categoria</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                {% for cat, count in report.cat_stats.items() | sort(attribute='1', reverse=True) %}
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-semibold">{{ cat or 'Sem categoria' }}</span>
+                        <span class="repeat-badge">{{ count }}</span>
+                    </div>
+                    <div class="progress" style="height:10px">
+                        {% set pct = (count / report.total_candidates * 100) | round(1) if report.total_candidates else 0 %}
+                        <div class="progress-bar bg-claro" style="width: {{ pct }}%"></div>
+                    </div>
+                    <small class="text-muted">{{ pct }}% do total</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Repeated collaborators -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-claro text-white">
+            <h5 class="mb-0"><i class="fas fa-redo me-2"></i>Colaboradores Recorrentes (indicados em mais de 1 período)</h5>
+        </div>
+        <div class="card-body">
+            {% if report.repeated %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th class="text-center">Nº de Períodos</th>
+                            <th>Períodos / Categoria</th>
+                            <th class="text-center">Total Votos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in report.repeated %}
+                        <tr>
+                            <td><strong>{{ r.nome }}</strong></td>
+                            <td class="text-center"><span class="repeat-badge">{{ r.count }}×</span></td>
+                            <td>
+                                {% for a in r.appearances %}
+                                <span class="badge bg-secondary me-1 mb-1">{{ a.period }} – {{ a.categoria }}{% if a.votes %} ({{ a.votes }}v){% endif %}</span>
+                                {% endfor %}
+                            </td>
+                            <td class="text-center"><strong>{{ r.appearances | sum(attribute='votes') }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center py-3">Nenhum colaborador aparece em mais de um período ainda.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

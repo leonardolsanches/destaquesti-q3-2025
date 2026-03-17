@@ -209,6 +209,15 @@ class DataManager:
         self._save_local_backup_voters()
         return True
 
+    def get_voter_status(self, email):
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM voters WHERE email = %s', (email,))
+        voter = cur.fetchone()
+        cur.close()
+        conn.close()
+        return dict(voter) if voter else None
+
     def has_voted(self, email, candidate_id):
         conn = get_db_connection()
         cur = conn.cursor()
@@ -437,3 +446,139 @@ class DataManager:
         cur.close()
         conn.close()
         return history
+
+    def delete_history_entry(self, entry_id):
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM voting_history WHERE id = %s', (entry_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    def import_history_from_excel(self, file_bytes):
+        import openpyxl
+        import io
+        from collections import defaultdict
+
+        wb = openpyxl.load_workbook(io.BytesIO(file_bytes))
+        ws = wb.active
+        headers = [str(c.value).strip() if c.value else '' for c in next(ws.iter_rows())]
+
+        col_map = {}
+        for idx, h in enumerate(headers):
+            h_lower = h.lower()
+            if 'colaborador' in h_lower:
+                col_map['nome'] = idx
+            elif 'justificativa' in h_lower:
+                col_map['justificativa'] = idx
+            elif 'gestor' in h_lower:
+                col_map['gestor'] = idx
+            elif 'periodo' in h_lower or 'período' in h_lower:
+                col_map['periodo'] = idx
+            elif 'categoria' in h_lower:
+                col_map['categoria'] = idx
+            elif 'área' in h_lower or 'area' in h_lower:
+                col_map['area'] = idx
+            elif 'coment' in h_lower:
+                col_map['comentario'] = idx
+
+        by_period = defaultdict(list)
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            if not any(row):
+                continue
+            def get(key):
+                idx = col_map.get(key)
+                return str(row[idx]).strip() if idx is not None and row[idx] else ''
+            nome = get('nome')
+            if not nome:
+                continue
+            periodo = get('periodo') or 'Sem período'
+            by_period[periodo].append({
+                'nome': nome,
+                'justificativa': get('justificativa'),
+                'gestor': get('gestor'),
+                'categoria': get('categoria'),
+                'area': get('area'),
+                'comentario': get('comentario'),
+                'vote_count': 0,
+                'photo': 'default_avatar.png'
+            })
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        inserted = 0
+        for periodo, candidates in by_period.items():
+            config_data = {'period': periodo, 'source': 'excel_import'}
+            cur.execute('''
+                INSERT INTO voting_history (description, config, candidates, total_voters, total_votes)
+                VALUES (%s, %s, %s, %s, %s)
+            ''', (
+                f'Importado via Excel – {periodo}',
+                json.dumps(config_data),
+                json.dumps(candidates),
+                0,
+                0
+            ))
+            inserted += 1
+
+        conn.commit()
+        cur.close()
+        conn.close()
+        return inserted
+
+    def get_history_report(self):
+        history = self.get_voting_history()
+        from collections import defaultdict, Counter
+
+        all_candidates = []
+        periods = []
+        for entry in history:
+            candidates = entry.get('candidates', [])
+            if isinstance(candidates, str):
+                import json as _json
+                candidates = _json.loads(candidates)
+            config = entry.get('config', {})
+            if isinstance(config, str):
+                import json as _json
+                config = _json.loads(config)
+            period = config.get('period', '') or entry.get('description', '')
+            periods.append({
+                'id': entry['id'],
+                'description': entry['description'],
+                'period': period,
+                'timestamp': entry['timestamp'],
+                'total_voters': entry.get('total_voters', 0),
+                'total_votes': entry.get('total_votes', 0),
+                'candidate_count': len(candidates),
+            })
+            for c in candidates:
+                all_candidates.append({
+                    'nome': c.get('nome', ''),
+                    'categoria': c.get('categoria', ''),
+                    'gestor': c.get('gestor', ''),
+                    'vote_count': c.get('vote_count', 0),
+                    'period': period,
+                    'entry_id': entry['id'],
+                })
+
+        name_counter = Counter(c['nome'] for c in all_candidates)
+        repeated = sorted(
+            [{'nome': n, 'count': c, 'appearances': [
+                {'period': x['period'], 'categoria': x['categoria'], 'votes': x['vote_count']}
+                for x in all_candidates if x['nome'] == n
+            ]} for n, c in name_counter.items() if c > 1],
+            key=lambda x: -x['count']
+        )
+
+        cat_stats = defaultdict(int)
+        for c in all_candidates:
+            cat_stats[c['categoria']] += 1
+
+        return {
+            'periods': sorted(periods, key=lambda x: x['period']),
+            'repeated': repeated,
+            'cat_stats': dict(cat_stats),
+            'total_entries': len(history),
+            'total_candidates': len(all_candidates),
+            'unique_candidates': len(set(c['nome'] for c in all_candidates)),
+        }

@@ -231,16 +231,16 @@ document.querySelectorAll('.edit-btn').forEach(btn => {
         const id = this.dataset.id;
 
         document.getElementById('editId').value = id;
-        document.getElementById('editNome').value = row.querySelector('.candidate-nome').textContent;
-        document.getElementById('editCategoria').value = row.querySelector('.candidate-categoria').textContent;
+        document.getElementById('editNome').value = row.querySelector('.candidate-nome').textContent.trim();
 
-        // Buscar dados completos do servidor
         try {
             const response = await fetch('/api/candidate/' + id);
             const candidate = await response.json();
             if (candidate) {
+                document.getElementById('editNome').value = candidate.nome || '';
                 document.getElementById('editJustificativa').value = candidate.justificativa || '';
                 document.getElementById('editGestor').value = candidate.gestor || '';
+                document.getElementById('editCategoria').value = candidate.categoria || '';
             }
         } catch (error) {
             console.error('Erro ao carregar dados do candidato:', error);
