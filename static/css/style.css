@@ -416,9 +416,26 @@ body {
     border-color: #8B1538;
 }
 
+/* ========== CANDIDATES TABLE — SCREEN COLUMN WIDTHS ========== */
+.candidates-table {
+    table-layout: fixed;
+    width: 100%;
+}
+.candidates-table .col-foto  { width: 68px; }
+.candidates-table .col-nome  { width: 18%; }
+.candidates-table .col-gestor { width: 120px; }
+.candidates-table .col-just  { width: auto; }
+.candidates-table .col-acoes { width: 152px; }
+
+.candidates-table td,
+.candidates-table th {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
 /* ========== PRINT STYLES ========== */
 @media print {
-    /* Hide non-essential UI */
+    /* --- Hide non-essential UI --- */
     nav,
     footer,
     .btn,
@@ -441,10 +458,27 @@ body {
         display: none !important;
     }
 
-    /* Remove background colors / shadows for clean print */
+    /* --- Hide Foto and Ações columns entirely in candidates table --- */
+    .candidates-table .col-foto,
+    .candidates-table .col-acoes,
+    .candidates-table col.col-foto,
+    .candidates-table col.col-acoes {
+        display: none !important;
+    }
+
+    /* --- Redistribute column widths for print (no foto / ações) --- */
+    .candidates-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+    .candidates-table .col-nome   { width: 22% !important; }
+    .candidates-table .col-gestor { width: 16% !important; }
+    .candidates-table .col-just   { width: 62% !important; }
+
+    /* --- Base print rules --- */
     body {
         background: white !important;
-        font-size: 11pt;
+        font-size: 10.5pt;
     }
 
     .card {
@@ -458,44 +492,49 @@ body {
         print-color-adjust: exact;
     }
 
-    /* Expand description/justificativa columns to fill freed width */
-    .justificativa-cell {
-        max-width: none !important;
-        width: auto !important;
-    }
-
     td, th {
         white-space: normal !important;
         word-break: break-word;
+        overflow-wrap: break-word;
+        padding: 4px 6px !important;
     }
 
-    /* Full-width containers */
+    .justificativa-cell,
+    .col-just {
+        max-width: none !important;
+    }
+
+    /* --- Containers fill the page --- */
     .container,
     .container-xxl,
     .container-xl,
     .container-fluid {
         max-width: 100% !important;
-        padding: 0 8px !important;
+        padding: 0 6px !important;
     }
 
-    /* Tables take full width */
+    /* --- Remove horizontal scroll wrapper for print --- */
+    .table-responsive {
+        overflow: visible !important;
+    }
+
     table {
         width: 100% !important;
     }
 
-    /* Expand collapsed sections for print */
+    /* --- Expand collapsed sections --- */
     .collapse {
         display: block !important;
         height: auto !important;
     }
 
-    /* Keep TOP 5 cards in a row */
+    /* --- TOP 5 cards --- */
     .col-md-4, .col-lg-2-4 {
         width: 20% !important;
         float: left;
     }
 
-    /* Page breaks */
+    /* --- Page breaks --- */
     .card.shadow.mb-4 {
         page-break-inside: avoid;
     }
