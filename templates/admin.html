@@ -207,14 +207,21 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle candidates-table">
+                    <colgroup>
+                        <col class="col-foto">
+                        <col class="col-nome">
+                        <col class="col-gestor">
+                        <col class="col-just">
+                        <col class="col-acoes">
+                    </colgroup>
                     <thead>
                         <tr>
-                            <th>Foto</th>
-                            <th>Nome</th>
-                            <th>Gestor</th>
-                            <th>Justificativa</th>
-                            <th>Ações</th>
+                            <th class="col-foto">Foto</th>
+                            <th class="col-nome">Nome</th>
+                            <th class="col-gestor">Gestor</th>
+                            <th class="col-just">Justificativa</th>
+                            <th class="col-acoes">Ações</th>
                         </tr>
                     </thead>
                     <tbody id="candidatesTable">
@@ -227,14 +234,14 @@
                                 </tr>
                             {% endif %}
                             <tr data-id="{{ candidate.id }}">
-                                <td>
+                                <td class="col-foto">
                                     <img src="{% if candidate.photo.startswith('data:image') %}{{ candidate.photo }}{% elif candidate.photo != 'default_avatar.png' %}{{ url_for('static', filename='uploads/' + candidate.photo) }}{% else %}{{ url_for('static', filename='images/default_avatar.png') }}{% endif %}"
                                          class="candidate-thumb" alt="{{ candidate.nome }}">
                                 </td>
-                                <td class="candidate-nome fw-semibold">{{ candidate.nome }}</td>
-                                <td class="candidate-gestor">{{ candidate.gestor }}</td>
-                                <td class="candidate-justificativa justificativa-cell">{{ candidate.justificativa }}</td>
-                                <td>
+                                <td class="candidate-nome col-nome fw-semibold">{{ candidate.nome }}</td>
+                                <td class="candidate-gestor col-gestor">{{ candidate.gestor }}</td>
+                                <td class="candidate-justificativa justificativa-cell col-just">{{ candidate.justificativa }}</td>
+                                <td class="col-acoes">
                                     <div class="d-flex gap-1">
                                         <button class="btn btn-sm btn-primary action-btn edit-btn" data-id="{{ candidate.id }}">
                                             <i class="fas fa-edit"></i>
